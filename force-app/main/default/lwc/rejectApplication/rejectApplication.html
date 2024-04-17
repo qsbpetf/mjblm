@@ -1,0 +1,58 @@
+<template>
+    <lightning-modal-header label={labels.REJECT}></lightning-modal-header>
+    <lightning-modal-body>
+        <lightning-spinner if:true={isLoading} size="medium"></lightning-spinner>
+        <label for="rejecter1" class="slds-form-element__label slds-no-flex">
+            {labels.REJECTED_BY}
+        </label>
+        <select id="rejecter1" class="slds-select" onchange={selectRejecter}>
+            <option value="">---</option>
+            <option for:each={rejecters} for:item="rejecter" value={rejecter.Id} key={rejecter.Id}>{rejecter.Name}</option>
+        </select>
+        <span class="xc-error" if:true={errorMsg.length}>{errorMsg}</span>
+        <lightning-textarea
+                data-validity-check="true"
+                field-level-help="Denna information sparas endast internt."
+                label={labels.REJECTED_NOTES_REASONS}
+                id="formRequest"
+                data-field="XC_RejectedNotes__c"
+                value={form.XC_RejectedNotes__c}
+                type="text"
+                onchange={inputChange}
+                style="display: block;"></lightning-textarea>
+        <div class="slds-form-element">
+            <label class="slds-checkbox_toggle slds-grid">
+                <span class="slds-form-element__label slds-m-bottom_none">Intyg Saknas</span>
+                <input data-field="XC_IntygSaknas__c"
+                       type="checkbox"
+                       name="checkbox-toggle-16"
+                       checked={form.XC_IntygSaknas__c}
+                       onchange={inputChange}
+                />
+                <span id="checkbox-toggle-17" class="slds-checkbox_faux_container"
+                      aria-live="assertive">
+                                      <span class="slds-checkbox_faux"></span>
+                                      <span class="slds-checkbox_on">Ja</span>
+                                      <span class="slds-checkbox_off">Nej</span>
+                                    </span>
+            </label>
+        </div>
+        <label class="slds-form-element__label slds-no-flex">
+            Genom att kryssa i denna ruta kommer ansökanden att få ett standardiserat svar som nämner att intyg saknas.
+        </label>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button
+                variant="brand"
+                class="slds-button slds-button__brand"
+                onclick={onSave}
+                label={labels.REJECT}
+                title={labels.REJECT}></lightning-button>
+        <lightning-button
+                variant="neutral"
+                class="slds-button slds-button__neutral"
+                onclick={onCancel}
+                label={labels.CANCEL}
+                title={labels.CANCEL}></lightning-button>
+    </lightning-modal-footer>
+</template>

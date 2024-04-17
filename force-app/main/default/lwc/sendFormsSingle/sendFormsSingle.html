@@ -1,0 +1,42 @@
+<template>
+    <c-confirmation-dialog
+            onconfirm={confirmed}
+            onreject={rejected}
+    ></c-confirmation-dialog>
+    <lightning-card>
+        <lightning-spinner alternative-text="Loading" size="medium" if:true={isLoading}></lightning-spinner>
+        <div class="slds-p-around_medium">
+            <div class="slds-p-around_medium">
+                <lightning-dual-listbox
+                        data-id="recipients"
+                        label={labels.SELECT_RECIPIENTS}
+                        name="Recipients"
+                        source-label={labels.RECIPIENTS}
+                        selected-label={labels.SELECTED_RECIPIENTS}
+                        field-level-help={labels.SELECT_RECIPIENTS}
+                        options={candidates}
+                        value={selected}
+                        onchange={handleChange}
+                >
+
+                </lightning-dual-listbox>
+
+
+                <h2 if:true={hasSelected} key={recipient.value} class="slds-m-top_small"><b>{labels.SELECTED_RECIPIENTS_TO_SEND_FORM} </b></h2>
+                <template for:each={selectedRecipients} for:item="recipient">
+                    <div key={recipient.value} class="slds-p-left_small slds-p-right_small" >{recipient.description}<span if:false={recipient.email} style="color: red;"> {labels.NO_EMAIL}</span></div>
+                </template>
+
+                <lightning-layout horizontal-align="spread" class="slds-p-around_medium">
+                    <lightning-layout-item >
+                        <lightning-input class="slds-m-left_medium" type="checkbox" label={labels.SAVE_DOCUMENTS_INTO_FILES} name="saveFormCheckbox" data-id="save" onchange={checkboxChanged}></lightning-input>
+                        <lightning-input class="slds-m-left_medium slds-m-bottom_medium" type="checkbox" disabled={selectedEmpty} label={labels.SEND_DOCUMENTS_TO_THE_RECIPIENTS} name="sendFormCheckbox" data-id="send" onchange={checkboxChanged}></lightning-input>
+                    </lightning-layout-item>
+                    <lightning-layout-item >
+                        <lightning-button disabled={buttonDisabled} variant="brand" onclick={createForm} label="Create form" >{labels.CREATE_FORMS}</lightning-button>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,38 @@
+<template>
+    <lightning-card if:true={visible}>
+        <div class="slds-container_small">
+            <section role="dialog" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <button if:true={closable} class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse">
+                        <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                            <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
+                        </svg>
+                        <span class="slds-assistive-text">Cancel and close</span>
+                    </button>
+                    <header class="slds-modal__header">
+                        <h1 class="slds-modal__title slds-hyphenate">
+                            {title}
+                        </h1>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        {question}
+                    </div>
+                    <footer  class="slds-modal__footer">
+                        <lightning-button
+                                variant="neutral"
+                                class="slds-button slds-button__neutral"
+                                onclick={handleReject}
+                                label={rejectLabel}
+                                title={rejectLabel}></lightning-button>
+                        <lightning-button
+                                variant="brand"
+                                class="slds-button slds-button__brand"
+                                onclick={handleConfirm}
+                                label={confirmLabel}
+                                title={confirmLabel}></lightning-button>
+                    </footer >
+                </div>
+            </section>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,20 @@
+<!--
+ - Created by lukasz on 22/09/2022.
+ -->
+
+<!-- Send Forms Riks -->
+<template>
+
+
+    <c-confirmation-dialog
+            onconfirm={confirmed}
+            onreject={rejected}
+    ></c-confirmation-dialog>
+    <lightning-card title="MEMBER FORMS CREATION" class="slds-p-around_medium">
+        <lightning-spinner alternative-text="Loading" size="medium" if:true={isLoading}></lightning-spinner>
+        <lightning-input class="slds-m-left_medium" type="checkbox" label={labels.SAVE_DOCUMENTS_INTO_FILES} name="saveFormCheckbox" data-id="save" onchange={checkboxChanged}></lightning-input>
+        <lightning-input class="slds-m-left_medium slds-m-bottom_medium" type="checkbox" label={labels.SEND_DOCUMENTS_TO_THE_RECIPIENTS} name="sendFormCheckbox" data-id="send" onchange={checkboxChanged}></lightning-input>
+        <lightning-button disabled={buttonDisabled} class="slds-m-around_small" variant="brand" onclick={createForms} label={labels.CREATE_FORMS} >{labels.SEND_FORMS}</lightning-button>
+    </lightning-card>
+
+</template>

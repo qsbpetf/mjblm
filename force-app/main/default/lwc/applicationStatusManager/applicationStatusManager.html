@@ -1,0 +1,49 @@
+<template>
+    <section if:true={isOpen}>
+        <lightning-button
+                if:true={readyForApproval}
+                variant="brand"
+                class="slds-button slds-button__brand"
+                onclick={handleApprove}
+                label={labels.APPROVE}
+                title={labels.APPROVE}></lightning-button>
+        <lightning-button
+                variant="destructive"
+                class="slds-button slds-button__destructive"
+                onclick={handleReject}
+                label={labels.REJECT}
+                title={labels.REJECT}></lightning-button>
+    </section>
+    <section>
+        <lightning-spinner if:true={isLoading} size="small"></lightning-spinner>
+        <template if:false={editMode}>
+            <label for="hanterasAv" class="slds-form-element__label slds-no-flex slds-m-top_small">
+                Hanteras av?
+            </label><br />
+            <span if:true={owner}>{owner.Name}</span>
+            <lightning-icon class="slds-m-left_small" icon-name="utility:edit" title="Edit" size="x-small" onclick={toggleEditMode}></lightning-icon>
+        </template>
+        <template if:true={editMode}>
+            <label for="hanterasAv" class="slds-form-element__label slds-no-flex slds-m-top_small">
+                Hanteras av?
+            </label>
+            <select required id="hanterasAv" class="slds-select slds-no-flex slds-m-bottom_small" onchange={selectOwner}>
+                <option>---</option>
+                <option for:each={contacts} for:item="contact" value={contact.Id} key={contact.Id}>{contact.Name}</option>
+            </select>
+            <lightning-button
+                    variant="neutral"
+                    class="slds-button slds-button__brand slds-no-flex"
+                    onclick={toggleEditMode}
+                    label={labels.CANCEL}
+                    title={labels.CANCEL}></lightning-button>
+            <lightning-button
+                    variant="brand"
+                    class="slds-button slds-button__brand slds-no-flex"
+                    onclick={saveOwner}
+                    label="Spara"
+                    disabled={ownerNotChanged}
+                    title="Spara"></lightning-button>
+        </template>
+    </section>
+</template>

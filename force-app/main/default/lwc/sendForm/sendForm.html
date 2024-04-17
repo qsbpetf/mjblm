@@ -1,0 +1,22 @@
+<template>
+    <c-confirmation-dialog
+            onconfirm={confirmed}
+            onreject={rejected}
+    ></c-confirmation-dialog>
+    <lightning-card>
+        <c-send-forms-riks if:true={showRiks} onclose={closeAction}></c-send-forms-riks>
+        <c-send-forms-single record-id={recordId} if:true={showSingle} onclose={closeAction}></c-send-forms-single>
+        <template if:false={hasPermission}>
+            <div class="slds-p-around_large">
+                <c-illustration
+                        if:false={hasPermission}
+                        title="You don't have a permission to use this funcionality.."
+                        type="not-available"
+                        class="slds-p-vertical_medium"
+                ></c-illustration>
+            </div>
+        </template>
+
+    </lightning-card>
+
+</template>

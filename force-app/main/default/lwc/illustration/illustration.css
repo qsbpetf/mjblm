@@ -1,0 +1,17 @@
+:host {
+    display: block;
+}
+
+.slds-illustration.slds-illustration_small img {
+    width:100%;
+    max-width:300px;
+    max-height:200px;
+    margin-bottom:var(--lwc-spacingMedium,1rem)
+}
+
+.slds-illustration.slds-illustration_large img {
+    width:100%;
+    max-width:600px;
+    max-height:400px;
+    margin-bottom:var(--lwc-spacingXxLarge,3rem)
+}

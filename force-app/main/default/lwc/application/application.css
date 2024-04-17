@@ -1,0 +1,55 @@
+.slds-card {
+    border-style: none;
+}
+
+
+
+.xc-grey-header {
+    background-color: #c0bcb4;
+    text-align: center;
+}
+
+.xc-grey-header h1 {
+    font-size: 2vh;
+    font-weight: bold;
+    display: inline-block;
+}
+
+ol {
+    list-style: decimal inside none;
+}
+
+lightning-card {
+    font-size: 1.8vh;
+}
+
+
+.xc-red {
+    color: red;
+}
+
+.slds-select {
+    font-size: 18px;
+}
+
+.show-inline {
+    display: inline;
+}
+
+.hide {
+    display: none;
+}
+
+.totalsumma {
+    font-size: 2.2vh;
+    font-weight: bold;
+}
+.main-card {
+    padding: 32px;
+}
+
+@media only screen and (max-width: 600px) {
+    .main-card {
+        padding: 8px;
+    }
+}

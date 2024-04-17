@@ -1,0 +1,17 @@
+<!--
+ - Created by lukasz on 07/12/2022.
+ -->
+
+<!-- Duplicated Applications -->
+<template>
+    <lightning-card if:true={duplicated.length}>
+        <div class="slds-p-around_medium">
+            <h1>Potentiella dubletter:</h1>
+            <ul>
+                <li for:each={duplicated} for:item="dup" key={dup.Id}>
+                    <a href={dup.link}> {dup.XC_FormId__c}</a>
+                </li>
+            </ul>
+        </div>
+    </lightning-card>
+</template>

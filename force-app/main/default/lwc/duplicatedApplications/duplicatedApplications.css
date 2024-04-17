@@ -1,0 +1,7 @@
+ul {
+    list-style: inside;
+}
+
+ul ol {
+    list-style-type: disc;
+}

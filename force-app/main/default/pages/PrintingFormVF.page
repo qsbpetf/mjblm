@@ -1,0 +1,162 @@
+<apex:page standardController="Account" extensions="PrintingFormsController" readOnly="true"
+           applyHtmlTag="false"
+           sidebar="false"
+           showHeader="false"
+           cache="true"
+           renderAs="pdf"
+           docType="html-5.0">
+    <head>
+        <style>
+            @page {
+                font-family: 'Helvetica', sans-serif;
+                size: A4 landscape;
+                margin: 0.5cm 0.5cm 0.5cm 0.5cm;
+            }
+
+            body, pre {
+                font-family: 'Helvetica', sans-serif;
+                font-size: 12px;
+            }
+
+            table {
+                -fs-table-paginate: paginate;
+                border-collapse: collapse;
+            }
+
+            h1 {
+                font-size: 18px;
+                font-weight: bold;
+            }
+
+            .gdpr {
+                font-size: 10px;
+            }
+
+            pre {
+                page-break-inside: avoid;
+                page-break-after: auto;
+                page-break-before: auto;
+            }
+
+            .content .content-table-row {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+            .content {
+                width: 100%;
+            }
+
+            .content .content-table {
+                width: 100%;
+            }
+
+            .header-content-table-data {
+                width: 50%;
+            }
+
+            .spacer {
+                height: 40px;
+            }
+
+            .content td{
+                border: 1px solid black;
+                padding: 2px;
+            }
+            tr {
+                vertical-align: top;
+            }
+
+            .row {
+                margin-top: -22px;
+            }
+
+        </style>
+    </head>
+    <body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <apex:image width="100px" value="{!URLFOR($Resource.logo,'majblommal_logo.png')}"/>
+            </div>
+            <div class="row">
+                <table class="header-content-table">
+                    <td class="header-content-table-data">
+                        <h1><b>Medlemslista {!year}</b></h1>
+                        <div class="gdpr">
+                            Kategorier: A=ordf, B=sekr, C=kassör, D1=insamlingsansvarig, D2=bidragsansvarig,
+                            F1=volontäransvarig, F=ledamot, H=revisor, I=revisorssuppl, G=övrig, U=informatör.
+                            <br/>
+                            OBS att endast en D1 ska anges (får beställningsinfo) och endast en D2 (får ansökningar).
+                            <br/>
+                            Uppdatera informationen om medlemmarna i föreningen direkt på blanketten och skicka
+                            till <a href="mailto:info@majblomman.se">info@majblomman.se</a> eller Majblommans Riksförbund,
+                            Kungsgatan 28, 411 19 Göteborg
+                        </div>
+                    </td>
+                    <td class="header-content-table-data">
+                        <h1>Lokalförening: {!lfNamePretty}</h1>
+                        <div class="gdpr">
+                            <b>Behandling av personuppgifter:</b> Majblomman har ansvaret för personuppgifter vi samlar in.
+                            För att organisera volontärarbete delas dina personuppgifter inom Majblommans organisation –
+                            mellan riksförbundet och lokalföreningarna. Vi sparar och använder därför dina uppgifter med
+                            stöd av att kunna fullgöra vårt avtal med dig som anmält dig som volontär. Du har rätt att veta
+                            hur vi använder dina personuppgifter. Mer information om dina rättigheter och hur vi använder
+                            dina personuppgifter finns på majblomman.se/integritetspolicy.
+                        </div>
+                    </td>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <table cellspacing="0" class="content-table">
+            <thead>
+            <tr class="content-table-headers">
+                <th width="25%" align="center">Namn/adress</th>
+                <th align="center">Telefon</th>
+                <th align="center">E-post</th>
+                <th align="center">Medlemskategori</th>
+                <th width="3%;" align="center">Födelseår</th>
+                <th align="center">Yrke</th>
+            </tr>
+            </thead>
+            <tbody>
+            <apex:repeat value="{!affiliations}" var="aff">
+                <tr class="content-table-row">
+                    <td style="border-left: 2px solid black;">
+                        <div>
+                            <apex:outputText escape="false" value="{!aff.contactName}"/>
+                        </div>
+                        <div>
+                            <apex:outputText escape="false" value="{!aff.companyName}"/>
+                        </div>
+                        <div>
+                            <apex:outputText escape="false" value="{!aff.address}"/>
+                        </div>
+                        <div class="spacer"></div>
+                    </td>
+                    <td>
+                        <div>Jobbtelefon: <apex:outputText value="{!aff.jobbTelefon}"/></div>
+                        <div>Hemtelefon: <apex:outputText value="{!aff.hemTelefon}"/></div>
+                        <div>Mobil: <apex:outputText value="{!aff.mobil}"/></div>
+                    </td>
+                    <td>
+                        <apex:outputText escape="false" value="{!aff.epost}"/>
+                    </td>
+                    <td>
+                        <apex:outputText escape="false" value="{!aff.medlemsKategorier}"/>
+                    </td>
+                    <td>
+                        <apex:outputText value="{!aff.fodelsear}"/>
+                    </td>
+                    <td style="border-right: 2px solid black;">
+                        <apex:outputText escape="false" value="{!aff.yrke}"/>
+                    </td>
+                </tr>
+            </apex:repeat>
+            </tbody>
+        </table>
+    </div>
+    </body>
+</apex:page>
