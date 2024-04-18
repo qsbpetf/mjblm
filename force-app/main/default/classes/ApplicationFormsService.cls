@@ -58,9 +58,27 @@ public inherited sharing class ApplicationFormsService {
                         XC_ArbetsplatsForening__c,
                         XC_ApprovedByCertifier__c,
                         XC_CertifierRejectionInfo__c,
-                        (SELECT XC_Fornamn__c, XC_Efternamn__c, XC_Fodelsear__c, XC_Personnummer__c FROM Barnen__r)
+                        (SELECT
+                                Id,
+                                Name,
+                                XC_Fornamn__c,
+                                XC_Efternamn__c,
+                                XC_Fodelsear__c,
+                                XC_Personnummer__c
+                        FROM Barnen__r),
+                        (SELECT
+                                Id,
+                                Name,
+                                Barnet_ApplicationEntry__c,
+                                Kategori__c,
+                                Underkategori__c,
+                                Beviljat_V_rde_Presentkort_Kontanter__c,
+                                Ans_kt_V_rde_Kontanter_Presentkort__c,
+                                Kontanter_Presentkort__c,
+                                Annat_Beskrivning__c
+                        FROM Bidragsrader__r)
                 FROM Application__c
-                WHERE XC_FormId__c = :formId
+                WHERE XC_FormId__c = :formId OR Id = :formId
         ];
     }
 

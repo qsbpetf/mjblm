@@ -1,0 +1,58 @@
+<template>
+    <section if:true={isOpen} class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <!-- Modal header -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={handleClose}>
+                    <lightning-icon icon-name="utility:close"
+                                    variant="inverse"
+                                    size="small"
+                                    alternative-text="Close">
+                    </lightning-icon>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading_medium">Redigera Bidragsrader</h2>
+            </header>
+            <!-- Modal content -->
+            <div class="slds-modal__content slds-p-around_medium">
+                <lightning-record-edit-form
+                        record-id={recordId}
+                        object-api-name="Bidragsrader__c"
+                        onsuccess={handleSuccess}>
+                    <lightning-messages>
+                    </lightning-messages>
+                    <lightning-input-field field-name="Name">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Kategori__c">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Underkategori__c">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Ans_kt_V_rde_Kontanter_Presentkort__c">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Beviljat_V_rde_Presentkort_Kontanter__c">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Kontanter_Presentkort__c">
+                    </lightning-input-field>
+                    <lightning-input-field field-name="Annat_Beskrivning__c">
+                    </lightning-input-field>
+                    <!-- Add more fields as needed -->
+
+                    <div class="slds-m-top_large slds-m-left_x-small">
+                        <lightning-button variant="neutral"
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick={handleClose}>
+                        </lightning-button>
+                        <lightning-button variant="brand"
+                                          type="submit"
+                                          label="Save"
+                                          title="Save"
+                                          class="slds-m-left_small">
+                        </lightning-button>
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+        </div>
+    </section>
+    <div if:true={isOpen} class="slds-backdrop slds-backdrop_open"></div>
+</template>

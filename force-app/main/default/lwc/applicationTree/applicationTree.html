@@ -1,0 +1,23 @@
+<!--
+ - Created by peterfriberg on 2024-04-17.
+ -->
+
+<!-- Application Tree -->
+<template>
+    <lightning-card title={cardTitle} icon-name="custom:custom55">
+        <div class="slds-m-around_medium">
+
+            <lightning-tree-grid
+                    data={data}
+                    columns={COLUMNS}
+                    key-field="id"
+                    onrowaction={handleRowClick}
+                    hide-checkbox-column
+            >
+            </lightning-tree-grid>
+
+            <c-bidragsrader-modal record-id={recId} is-open={isModalOpen} onclose={closeModal}></c-bidragsrader-modal>
+
+        </div>
+    </lightning-card>
+</template>
