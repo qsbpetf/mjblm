@@ -27,6 +27,8 @@ export default class ApplicationTree extends LightningElement {
     actions = actions;
     @track record;
     @track recId = '';
+    @track totalRequested = 0;
+    @track totalGranted = 0;
 
     COLUMNS = [
         {
@@ -155,6 +157,8 @@ export default class ApplicationTree extends LightningElement {
     buildTree() {
         let treeData = [];
         let barn = {};
+        let _totalRequested = 0;
+        let _totalGranted = 0;
 
         debugger;
 
@@ -199,9 +203,15 @@ export default class ApplicationTree extends LightningElement {
             barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
             barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
             barn[child.Barnet_ApplicationEntry__c].granted += childNode.granted || 0;
+            _totalRequested += childNode.request || 0;
+            _totalGranted += childNode.granted || 0;
             this.dataById[child.Id] = childNode;
             this.recordById[child.Id] = child;
         });
+
+        const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.totalRequested = formatter.format(_totalRequested);
+        this.totalGranted = formatter.format(_totalGranted);
 
         return treeData;
     }
