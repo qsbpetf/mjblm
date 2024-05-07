@@ -86,7 +86,7 @@ export default class ApplicationTree extends LightningElement {
             type: 'button',
             label: 'Detaljer',
             typeAttributes: {
-                iconName: 'utility:preview',
+                iconName: 'utility:edit',
                 name: 'edit_details',
                 label: 'Redigera',
                 title: 'Redigera',
@@ -129,11 +129,13 @@ export default class ApplicationTree extends LightningElement {
             console.log('Record was saved');
             // You can perform additional actions here if needed, such as refreshing data
             console.log('Record was saved: ', JSON.stringify(event.detail.data, null, 2));
-            // let childNode = this.dataById[event.detail.data.id];
-            // childNode.description = event.detail.data.fields.Annat_Beskrivning__c.value;
-            // console.log('Updated childNode: ', JSON.stringify(childNode, null, 2));
             let rec = this.recordById[event.detail.data.id];
             rec.Annat_Beskrivning__c = event.detail.data.fields.Annat_Beskrivning__c.value;
+            rec.Ans_kt_V_rde_Kontanter_Presentkort__c = event.detail.data.fields.Ans_kt_V_rde_Kontanter_Presentkort__c.value;
+            rec.Beviljat_V_rde_Presentkort_Kontanter__c = event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value;
+            rec.Kontanter_Presentkort__c = event.detail.data.fields.Kontanter_Presentkort__c.value;
+            rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
+            rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
             this.data = this.buildTree();
         }
@@ -154,6 +156,14 @@ export default class ApplicationTree extends LightningElement {
         let treeData = [];
         let barn = {};
 
+        debugger;
+
+        console.log(JSON.stringify(this.record, null, 2));
+
+        if (this.record === undefined || this.record === null || this.record.Barnen__r === undefined || this.record.Barnen__r === null) {
+            return treeData;
+        }
+
         this.record.Barnen__r.forEach(child => {
             let childNode = {
                 id: child.Id,
@@ -169,6 +179,10 @@ export default class ApplicationTree extends LightningElement {
             barn[child.Id] = childNode;
             treeData.push(childNode);
         });
+
+        if (this.record.Bidragsrader__r === undefined || this.record.Bidragsrader__r === null) {
+            return treeData;
+        }
 
         this.record.Bidragsrader__r.forEach(child => {
             let childNode = {
