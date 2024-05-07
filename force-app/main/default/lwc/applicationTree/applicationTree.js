@@ -88,13 +88,13 @@ export default class ApplicationTree extends LightningElement {
             type: 'button',
             label: 'Detaljer',
             typeAttributes: {
-                iconName: 'utility:edit',
+                iconName: { fieldName: 'icon' },
                 name: 'edit_details',
-                label: 'Redigera',
-                title: 'Redigera',
+                label: { fieldName: 'action' },
+                title: { fieldName: 'action' },
                 variant: 'base'
             },
-            initialWidth: 100
+            initialWidth: 120
         }
     ];
 
@@ -113,6 +113,9 @@ export default class ApplicationTree extends LightningElement {
         if (this.selectedItem.level === 2) {
             // Open Bidragsrader__c record modal
             this.openModal(this.selectedItem.id);
+        } else if (this.selectedItem.level === 1) {
+            // Open Add Bidrag screen flow
+            alert('Open Add Bidrag screen flow');
         }
     }
 
@@ -178,6 +181,8 @@ export default class ApplicationTree extends LightningElement {
                 birthYear: child.XC_Fodelsear__c,
                 request: 0,
                 granted: 0,
+                action: 'Nytt Bidrag',
+                icon: 'utility:add',
                 _children: []
             };
             barn[child.Id] = childNode;
@@ -198,7 +203,9 @@ export default class ApplicationTree extends LightningElement {
                 request: child.Ans_kt_V_rde_Kontanter_Presentkort__c,
                 granted: child.Beviljat_V_rde_Presentkort_Kontanter__c,
                 paymentType: child.Kontanter_Presentkort__c,
-                description: child.Annat_Beskrivning__c
+                description: child.Annat_Beskrivning__c,
+                action: 'Redigera',
+                icon: 'utility:edit',
             };
             barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
             barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
