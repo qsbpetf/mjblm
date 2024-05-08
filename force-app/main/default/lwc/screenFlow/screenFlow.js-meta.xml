@@ -14,11 +14,6 @@
     <targetConfigs>
         <targetConfig targets="lightningCommunity__Default">
             <property name="flowApiName" type="String" label="Flow API Name" description="The API name of the Lightning Flow" required="true"/>
-            <property name="buttonLabel" type="String" label="Button Label" description="The label of the button" required="true" default="Start"/>
-            <property name="buttonJustify" type="String" label="Button Justify" datasource="left,center,right" default="center"/>
-            <property name="casePrefix" type="String" label="Case Prefix" description="The type of the case [Support, PSIRT]" required="false" default="Support"/>
-            <property name="recordId" type="String" label="Record Id" description="Pass the page's record id to the component variable {!recordId}" />
-            <property name="objectApiName" type="String" label="Object Name" description="Pass the page's object name to the component variable {!objectApiName}" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

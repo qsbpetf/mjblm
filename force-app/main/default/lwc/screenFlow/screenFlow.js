@@ -28,13 +28,43 @@ import userAccountIdField from '@salesforce/schema/User.AccountId';
 import { getRecord } from 'lightning/uiRecordApi';
 
 export default class ScreenFlow extends LightningElement {
-    // These will be set from the community builder or the page where you are using this LWC
-    @api flowApiName;
-    @api buttonLabel;
-    @api casePrefix;
-    @api recordId;      // This property is populated by the App Builder when the component is placed on a record page.
-    @api objectApiName; // API name of the record’s sObject type.
-    @api buttonJustify;
+    @api
+    get flowApiName() {
+        return this.privateFlowApiName;
+    }
+    set flowApiName(value) {
+        console.log('set flowApiName() called with value: ' + value);
+        this.privateFlowApiName = value;
+    }
+
+    @api handleStartFlow(data) {
+        console.log('screenFlow.data = ', JSON.stringify(data));
+        this.flowInputVariables = [
+            {
+                name : 'varContactId',
+                type : 'String',
+                value : this.contactId
+            },
+            {
+                name : 'varAccountId',
+                type : 'String',
+                value : this.accountId
+            },
+            {
+                name : 'varRecordId',
+                type : 'String',
+                value : data.recordId
+            },
+            {
+                name : 'varObjectApiName',
+                type : 'String',
+                value : data.objectApiName
+            }
+        ];
+        this.showFlow = true;
+    }
+
+    privateFlowApiName;
 
     // @track flowTitle = 'Your Flow Title';
     @track showFlow = false;
@@ -46,7 +76,8 @@ export default class ScreenFlow extends LightningElement {
     // Flag to check if wire service returned data
     wireCompleted = false;
     @wire(getRecord, {
-        recordId: userId, fields: [
+        recordId: userId,
+        fields: [
             userContactIdField, userAccountIdField
         ]
     })
@@ -61,59 +92,25 @@ export default class ScreenFlow extends LightningElement {
             console.log('ContactId:', this.contactId);
             console.log('RecordId:', (this.recordId) ? this.recordId : '');
             console.log('ObjectApiName:', (this.objectApiName) ? this.objectApiName : '');
-            console.log('CasePrefix:', (this.casePrefix) ? this.casePrefix : '');
             console.log('PageRef:', (this.pageRef) ? this.pageRef : '');
             this.wireCompleted = true;
         }
     }
 
-    get buttonJustifyClass() {
-        return `button-container-${this.buttonJustify}`;
-    }
-
     handleStatusChange(event) {
         console.log('EVENT = ', JSON.parse(JSON.stringify(event.detail)));
         if (event.detail.status === 'FINISHED') {
+            this.dispatchEvent(new CustomEvent('close', {
+                detail: {
+                    saved: true,
+                    data: event.detail
+                }
+            }));
             this.closeModal();
         }
     }
 
     closeModal() {
         this.showFlow = false;
-    }
-
-    // 3 flows covering 9 scenarios
-    // Log a case
-    //    varCasePrefix (configurable) = "Support" eller "PSIRT"
-    //
-    handleStartFlow() {
-        this.flowInputVariables = [
-            {
-                name : 'varContactId',
-                type : 'String',
-                value : this.contactId
-            },
-            {
-                name : 'varAccountId',
-                type : 'String',
-                value : this.accountId
-            },
-            {
-                name : 'varCasePrefix',
-                type : 'String',
-                value : this.casePrefix
-            },
-            {
-                name : 'varRecordId',
-                type : 'String',
-                value : (this.recordId) ? this.recordId : ''
-            },
-            {
-                name : 'varObjectApiName',
-                type : 'String',
-                value : (this.objectApiName) ? this.objectApiName : ''
-            }
-        ];
-        this.showFlow = true;
     }
 }

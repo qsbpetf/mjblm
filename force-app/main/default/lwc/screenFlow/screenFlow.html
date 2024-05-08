@@ -8,19 +8,19 @@
  -  Description:
  -    The screenFlow is a Lightning Web Component that shows a modal dialog with a
  -    Salesforce flow embedded in it. This dialog is shown or hidden based on the state
- -    of the 'showFlow' property. When 'showFlow' is false, a button is displayed
- -    instead. Clicking this button triggers the 'handleStartFlow' function. The close
+ -    of the 'showFlow' property. Call 'handleStartFlow()' function to open. The close
  -    button in the dialog calls the 'closeModal' function. The Salesforce flow embedded
  -    in this component is determined by the 'flowApiName' property, and its input
  -    variables are stored in the 'flowInputVariables' property.
+ -    When modal is closed the 'onclose' event is fired.
  -
  -  Change Log:
- -     2023-10-18  Peter Friberg  Initial Development.
+ -     2024-05-08  Peter Friberg  Initial Development.
  -->
 
 <!-- Screen Flow -->
 <template>
-    <div style="height: 100%;">
+    <div style="">
         <template lwc:if={showFlow}>
 
             <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
@@ -47,13 +47,8 @@
                     </div>
                 </div>
             </section>
-            <div class="slds-backdrop slds-backdrop_open"></div>
 
-        </template>
-        <template lwc:else>
-            <div class={buttonJustifyClass}>
-                <lightning-button label={buttonLabel} onclick={handleStartFlow} variant="brand"></lightning-button>
-            </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
     </div>
 </template>
