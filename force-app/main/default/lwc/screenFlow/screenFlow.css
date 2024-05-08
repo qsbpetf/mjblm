@@ -1,0 +1,46 @@
+/*
+----------------------------------------------------------------------------
+|  Lightning CSS: screenFlow.css
+|
+|  Filename: screenFlow.css.css
+|
+|  Author: Peter Friberg, Xceed AB
+|
+|  Description:
+|     XXXXX
+|
+| Change Log:
+| 2023-11-22  Peter Friberg  Initial Development.
+----------------------------------------------------------------------------
+*/
+
+.button-container-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.button-container-left {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    height: 100%;
+}
+
+.button-container-right {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    height: 100%;
+}
+
+.close-button-right {
+    position: absolute;
+    right: 0.8rem;
+    top: 0.8rem;
+}
+
+.bigger-header {
+    padding: 1.5rem;
+}
