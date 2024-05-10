@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>60.0</apiVersion>
+    <assignments>
+        <name>Add_Details</name>
+        <label>Add Details</label>
+        <locationX>176</locationX>
+        <locationY>674</locationY>
+        <assignmentItems>
+            <assignToReference>New_Request_Record</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Created_Record</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>New_Request</name>
+        <label>New_Request</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>New_Request_Record.Application__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Child_Record.XC_Application__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>New_Request_Record.Barnet_ApplicationEntry__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Child_Record.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>New_Request_Record.F_rening_Klubb__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Child_Record.XC_Application__r.XC_LF__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>New_Request_Record.Kategori__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>F: Glasögon</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>New_Request_Record.Ans_kt_V_rde_Kontanter_Presentkort__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <numberValue>500.0</numberValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Create_New_Request</targetReference>
+        </connector>
+    </assignments>
+    <description>Create new child request</description>
+    <environments>Default</environments>
+    <interviewLabel>New Child Request {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>New Child Request</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordCreates>
+        <name>Create_New_Request</name>
+        <label>Create New Request</label>
+        <locationX>176</locationX>
+        <locationY>458</locationY>
+        <connector>
+            <targetReference>Get_Created_Record</targetReference>
+        </connector>
+        <inputReference>New_Request_Record</inputReference>
+    </recordCreates>
+    <recordLookups>
+        <description>Get current child record</description>
+        <name>Get_Child_Record</name>
+        <label>Get Child Record</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Skapa_Bidragsrad_for_barn</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varRecordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>XC_ApplicationEntryChild__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Created_Record</name>
+        <label>Get Created Record</label>
+        <locationX>176</locationX>
+        <locationY>566</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Add_Details</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>New_Request_Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Bidragsrader__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <screens>
+        <description>Skapa Bidragsrad för barn</description>
+        <name>Skapa_Bidragsrad_for_barn</name>
+        <label>Skapa Bidragsrad för barn</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <connector>
+            <targetReference>New_Request</targetReference>
+        </connector>
+        <fields>
+            <name>Display_Action</name>
+            <fieldText>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;strong style=&quot;font-size: 16px;&quot;&gt;Nytt Bidrag﻿&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>Display_Child_Name</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Barnets namn: {!Get_Child_Record.XC_Fornamn__c} {!Get_Child_Record.XC_Efternamn__c}&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>DisplayContactId</name>
+            <fieldText>&lt;p&gt;varContactId: {!varContactId}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>DisplayAccountId</name>
+            <fieldText>&lt;p&gt;varAccountId: {!varAccountId}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>DisplayRecordId</name>
+            <fieldText>&lt;p&gt;varRecordId: {!varRecordId}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <fields>
+            <name>DisplayObjectApiName</name>
+            <fieldText>&lt;p&gt;varObjectApiName: {!varObjectApiName}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Child_Record</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Den nya bidragsrad record som skapas</description>
+        <name>New_Request_Record</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Bidragsrader__c</objectType>
+    </variables>
+    <variables>
+        <description>Account Id of current logged in user</description>
+        <name>varAccountId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Contact Id of current logged in user</description>
+        <name>varContactId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>API name of current object for the current varRecordId</description>
+        <name>varObjectApiName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Record Id of the current child (XC_ApplicationEntryChild__c)</description>
+        <name>varRecordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>

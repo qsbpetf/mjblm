@@ -2,33 +2,33 @@
  * Created by peterfriberg on 2024-04-17.
  */
 
-import { LightningElement, api, wire, track } from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
-
-const actions = [
-    {
-        label: 'Redigera',
-        name: 'edit_details',
-        iconName: 'utility:view_details'
-    }
-];
 
 export default class ApplicationTree extends LightningElement {
 
     @api recordId;
+    @api flowApiName = '';
+
     @track data = [];
     @track dataById = {};
+    @track barn = {};
     @track recordById = {};
 
     @track isModalOpen = false; // Used to control the visibility of modal
     @track selectedItem = { id: '' }; // Used to store the clicked row data handleRowClick(event) {
     @track content;
 
-    actions = actions;
     @track record;
     @track recId = '';
     @track totalRequested = 0;
     @track totalGranted = 0;
+    @track _totalRequested = 0;
+    @track _totalGranted = 0;
+
+    @track childRecordId = '';
+    @track childRecordObjectApiName = '';
+    @track childRecordFlowApiName = this.flowApiName;
 
     COLUMNS = [
         {
@@ -106,7 +106,7 @@ export default class ApplicationTree extends LightningElement {
     handleRowClick(event) {
         this.selectedItem = event.detail.row;
         const action = event.detail.action;
-        console.log('Action: ', action.name);
+        console.log('Action: ', action.label);
         console.log('Selected Row: ', this.selectedItem, JSON.stringify(this.selectedItem, null, 2));
         this.content = JSON.stringify(this.selectedItem, null, 2);
 
@@ -114,8 +114,8 @@ export default class ApplicationTree extends LightningElement {
             // Open Bidragsrader__c record modal
             this.openModal(this.selectedItem.id);
         } else if (this.selectedItem.level === 1) {
-            // Open Add Bidrag screen flow
-            alert('Open Add Bidrag screen flow');
+            // Open New_Child_Request screen flow
+            this.openScreeenFlowModal(this.selectedItem.id);
         }
     }
 
@@ -124,6 +124,19 @@ export default class ApplicationTree extends LightningElement {
         this.recId = recId;
         this.isModalOpen = true;
         console.log('openModal() calling for record id: ' + this.recId);
+    }
+
+    openScreeenFlowModal(recId) {
+        this.childRecordId = recId;
+        this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
+        this.childRecordFlowApiName = this.flowApiName;
+        debugger;
+        // find c-screen-flow component and call startFlow() method
+        const flowComponent = this.template.querySelector('c-screen-flow');
+        flowComponent.handleStartFlow({
+            recordId: this.childRecordId,
+            objectApiName: this.childRecordObjectApiName
+        });
     }
 
     // Method to close the modal
@@ -147,6 +160,29 @@ export default class ApplicationTree extends LightningElement {
         this.isModalOpen = false;
     }
 
+    handleFlowSubmit(event) {
+        console.log('handleSubmit() called');
+        console.log(event.detail)
+        // check event for closed modal and saved pressed
+        if (event.detail && event.detail.saved) {
+            console.log('Record was saved', event.detail);
+            console.log('Errors: ', event.detail.errors);
+            console.log('Output Variables: ', event.detail.data.outputVariables);
+            if (event.detail.data.outputVariables) {
+                let child = event.detail.data.outputVariables.find(item => {
+                    if (item.dataType === 'SOBJECT' && item.name === 'New_Request_Record' && item.objectType === 'Bidragsrader__c') {
+                        return true;
+                    }
+                });
+                if (child) {
+                    console.log('Found record: ', child.value);
+                    this.record.Bidragsrader__r.push(child.value);
+                    this.data = this.buildTree();
+                }
+            }
+        }
+    }
+
     connectedCallback() {
         this.getApplication(this.recordId);
     }
@@ -159,9 +195,9 @@ export default class ApplicationTree extends LightningElement {
 
     buildTree() {
         let treeData = [];
-        let barn = {};
-        let _totalRequested = 0;
-        let _totalGranted = 0;
+        this.barn = {};
+        this._totalRequested = 0;
+        this._totalGranted = 0;
 
         debugger;
 
@@ -185,7 +221,7 @@ export default class ApplicationTree extends LightningElement {
                 icon: 'utility:add',
                 _children: []
             };
-            barn[child.Id] = childNode;
+            this.barn[child.Id] = childNode;
             treeData.push(childNode);
         });
 
@@ -207,18 +243,18 @@ export default class ApplicationTree extends LightningElement {
                 action: 'Redigera',
                 icon: 'utility:edit',
             };
-            barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
-            barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
-            barn[child.Barnet_ApplicationEntry__c].granted += childNode.granted || 0;
-            _totalRequested += childNode.request || 0;
-            _totalGranted += childNode.granted || 0;
+            this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
+            this.barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
+            this.barn[child.Barnet_ApplicationEntry__c].granted += childNode.granted || 0;
+            this._totalRequested += childNode.request || 0;
+            this._totalGranted += childNode.granted || 0;
             this.dataById[child.Id] = childNode;
             this.recordById[child.Id] = child;
         });
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
-        this.totalRequested = formatter.format(_totalRequested);
-        this.totalGranted = formatter.format(_totalGranted);
+        this.totalRequested = formatter.format(this._totalRequested);
+        this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
     }
