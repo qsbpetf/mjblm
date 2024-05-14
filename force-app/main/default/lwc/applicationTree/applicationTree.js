@@ -4,11 +4,13 @@
 
 import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
+import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatesApplications';
 
 export default class ApplicationTree extends LightningElement {
 
     @api recordId;
     @api flowApiName = '';
+    @api monthsOld = 12;
 
     @track data = [];
     @track dataById = {};
@@ -29,6 +31,9 @@ export default class ApplicationTree extends LightningElement {
     @track childRecordId = '';
     @track childRecordObjectApiName = '';
     @track childRecordFlowApiName = this.flowApiName;
+
+    @track latestApplications = [];
+    @track urls = [];
 
     COLUMNS = [
         {
@@ -176,6 +181,9 @@ export default class ApplicationTree extends LightningElement {
                 });
                 if (child) {
                     console.log('Found record: ', child.value);
+                    if (this.record.Bidragsrader__r === undefined || this.record.Bidragsrader__r === null) {
+                        this.record.Bidragsrader__r = [];
+                    }
                     this.record.Bidragsrader__r.push(child.value);
                     this.data = this.buildTree();
                 }
@@ -185,12 +193,28 @@ export default class ApplicationTree extends LightningElement {
 
     connectedCallback() {
         this.getApplication(this.recordId);
+        this.getLatestApplications(this.recordId);
     }
 
     async getApplication(applicationId) {
         this.record = await apexGetApplication({ formId: applicationId });
         console.log('Application: ', this.record, JSON.stringify(this.record, null, 2));
         this.data = this.buildTree();
+    }
+
+    async getLatestApplications(applicationId) {
+        this.latestApplications = await apexGetLatestApplications( {
+            appId: applicationId,
+            monthsOld: this.monthsOld
+        });
+        console.log(this.latestApplications, JSON.stringify(this.latestApplications, null, 2));
+        this.urls = this.latestApplications.map(app => {
+            return {
+                label: app.Name,
+                url: '/application/s/application/' + app.Id
+            }
+        });
+        console.log(this.urls, JSON.stringify(this.urls, null, 2));
     }
 
     buildTree() {
