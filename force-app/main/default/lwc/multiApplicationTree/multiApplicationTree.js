@@ -22,6 +22,12 @@ export default class MultiApplicationTree extends LightningElement {
     @track _totalRequested = 0;
     @track _totalGranted = 0;
 
+    @track recId;
+    @track childRecordId = '';
+    @track childRecordObjectApiName = '';
+    @track childRecordFlowApiName = this.flowApiName;
+    @track isModalOpen = false; // Used to control the visibility of modal
+
     COLUMNS = [
         {
             type: 'url',
