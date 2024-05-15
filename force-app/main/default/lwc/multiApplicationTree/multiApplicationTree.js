@@ -90,12 +90,12 @@ export default class MultiApplicationTree extends LightningElement {
             initialWidth: 120
         },
         {
-            type: 'text',
-            // fieldName: 'status',
+            type: 'icon',
             label: 'Färdigbeh.',
             cellAttributes: {
                 alternativeText: { fieldName: 'statusIcon' },
-                iconName: { fieldName: 'statusIcon' }
+                iconName: { fieldName: 'statusIcon' },
+                size: 'x-small'
             },
         }
     ];
@@ -109,29 +109,43 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     handleRowSelection(event) {
-        console.log('this.selectedRows BEFORE: ', this.selectedRows);
-
-        console.log('Event Detail: ', JSON.stringify(event.detail, null, 2));
-
         const eventAction = event.detail.config.action;
-        console.log('Event Action: ', eventAction);
         const selectedRowId = event.detail.config.value;
-        console.log('(Un)selected Row Id: ', selectedRowId);
-
-        console.log('Selected Rows: ', JSON.stringify(event.detail.selectedRows, null, 2));
 
         if (eventAction === 'rowSelect') {
-            let selectedRow = event.detail.selectedRows.find(row => row.id === selectedRowId);
-            console.log('Selected Row: ', selectedRow);
-            console.log('Selected Row level: ', selectedRow.level);
+            let selectedRow = this.findSelectedRow(event, selectedRowId);
             if (selectedRow.level > 1) {
-                this.selectedRows = event.detail.selectedRows.filter(row => row.id !== selectedRowId).map(row => row.id);
-                console.log('this.selectedRows AFTER: ', this.selectedRows);
-                alert('Du kan bara välja en ansökan!');
+                this.selectedRows = this.filterSelection(event, selectedRowId)
+                alert('Du kan bara välja ansökningsrad(er)');
+            } else if (selectedRow.level === 1) {
+                if (!this.validateApp(selectedRow)) {
+                    this.selectedRows = this.keepSelection(event);
+                    alert('Du kan bara välja färdigbehandlade ansökningar');
+                }
             }
         } else if (eventAction === 'selectAllRows') {
-            this.selectedRows = event.detail.selectedRows.filter(row => row.level === 1).map(row => row.id);
+            this.selectedRows = this.keepSelection(event);
         }
+    }
+
+    validateApp(row) {
+        return (row.level === 1) && (row.grantedTotalCount === row.grantedDefinedCount);
+    }
+
+    findSelectedRow(event, selectedRowId) {
+        return event.detail.selectedRows.find(row => row.id === selectedRowId);
+    }
+
+    filterSelection(event, selectedRowId) {
+        return event.detail.selectedRows
+            .filter(row => row.id !== selectedRowId)
+            .map(row => row.id);
+    }
+
+    keepSelection(event) {
+        return event.detail.selectedRows
+            .filter(row => this.validateApp(row))
+            .map(row => row.id);
     }
 
     handleRowClick(event) {
@@ -268,7 +282,7 @@ export default class MultiApplicationTree extends LightningElement {
 
         Object.entries(this.apps).forEach(([key, app]) => {
             console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount);
-            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'utility:success' : 'utility:warning';
+            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
             console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount, ' Status icon=', app.statusIcon);
         });
 
