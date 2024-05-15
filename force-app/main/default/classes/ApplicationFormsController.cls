@@ -83,7 +83,7 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
-    public static List<Application__c> getLatesApplications(Id appId, Integer monthsOld) {
+    public static List<Application__c> getLatestApplications(Id appId, Integer monthsOld) {
         try {
             List<Application__c> apps = ApplicationFormsService.getLatestApplications(appId, monthsOld);
             return apps;
