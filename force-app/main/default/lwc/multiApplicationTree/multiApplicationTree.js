@@ -36,7 +36,7 @@ export default class MultiApplicationTree extends LightningElement {
             typeAttributes: {
                 label: { fieldName: 'name' }
             },
-            initialWidth: 120
+            initialWidth: 180
         },
         {
             type: 'text',
@@ -269,6 +269,8 @@ export default class MultiApplicationTree extends LightningElement {
                     birthYear: child.XC_Fodelsear__c,
                     request: 0,
                     granted: 0,
+                    grantedTotalCount: 0,
+                    grantedDefinedCount: 0,
                     action: 'Nytt Bidrag',
                     icon: 'utility:add',
                     _children: []
@@ -297,6 +299,8 @@ export default class MultiApplicationTree extends LightningElement {
                     child._children.push(reqNode);
                     child.request += reqNode.request || 0;
                     child.granted += reqNode.granted || 0;
+                    child.grantedDefinedCount += (reqNode.granted) ? 1 : 0;
+                    child.grantedTotalCount += 1;
                     this._totalRequested += reqNode.request || 0;
                     this._totalGranted += reqNode.granted || 0;
                     this.dataById[request.Id] = reqNode;
@@ -308,6 +312,14 @@ export default class MultiApplicationTree extends LightningElement {
                     appNode.grantedTotalCount += 1;
                 });
             }
+
+            let appNode = this.apps[app.Id];
+            appNode.name = appNode.name + ' (' + appNode._children.length + ') ' + appNode.grantedDefinedCount + '/' + appNode.grantedTotalCount;
+
+            app.Barnen__r.forEach(child => {
+                let childNode = this.barn[child.Id];
+                childNode.name = childNode.name + ' ' + childNode.grantedDefinedCount + '/' + childNode.grantedTotalCount;
+            });
         });
 
         Object.entries(this.apps).forEach(([key, app]) => {
