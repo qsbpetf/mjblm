@@ -18,7 +18,7 @@
                 <div class="slds-col slds-col_padded slds-m-left_xx-large slds-text-heading_small">
                     Ansökningar senaste {monthsOld} mån: &nbsp;(&nbsp;
                     <template for:each={urls} for:item="url">
-                        <a key={url.url} href={url.url} target="_blank">{url.label}</a>
+                        <a key={url.url} href={url.url} target="_blank" title={url.details}>{url.label}</a>
                         &nbsp;
                     </template>
                     )

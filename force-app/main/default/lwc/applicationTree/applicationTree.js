@@ -35,6 +35,9 @@ export default class ApplicationTree extends LightningElement {
     @track latestApplications = [];
     @track urls = [];
 
+
+    // TODO: Add validation, if application is 'Approved' then disable the 'Redigera' button and 'Lägg till nytt bidrag' button
+
     COLUMNS = [
         {
             type: 'url',
@@ -209,12 +212,38 @@ export default class ApplicationTree extends LightningElement {
         });
         console.log(this.latestApplications, JSON.stringify(this.latestApplications, null, 2));
         this.urls = this.latestApplications.map(app => {
-            return {
+            let obj = {
                 label: app.Name,
                 url: '/application/s/application/' + app.Id
-            }
+            };
+            obj.details = this.generateDetails(app);
+            return obj;
         });
         console.log(this.urls, JSON.stringify(this.urls, null, 2));
+    }
+
+    generateDetails(app) {
+        let details = '';
+        let childById = {};
+        app.Barnen__r.forEach(child => {
+            child.Bidragsrader__r = [];
+            childById[child.Id] = child;
+        });
+
+        app.Bidragsrader__r.forEach(row => {
+            let child = childById[row.Barnet_ApplicationEntry__c];
+            child.Bidragsrader__r.push(row);
+        });
+
+        app.Barnen__r.forEach(child => {
+            details += '\n' + child.XC_Fornamn__c + ' ' + child.XC_Efternamn__c + ':\n';
+            child.Bidragsrader__r.forEach(row => {
+                details += '   - ' +
+                    row.Kategori__c + (row.Underkategori__c ? ' (' + row.Underkategori__c  + ')' : '') + '  Ansökt: ' +
+                    row.Ans_kt_V_rde_Kontanter_Presentkort__c + '  Beviljat: ' + (row.Beviljat_V_rde_Presentkort_Kontanter__c ? row.Beviljat_V_rde_Presentkort_Kontanter__c : 'saknas') + '\n';
+            });
+        });
+        return details;
     }
 
     buildTree() {
