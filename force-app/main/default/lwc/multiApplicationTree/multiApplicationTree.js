@@ -189,6 +189,30 @@ export default class MultiApplicationTree extends LightningElement {
         });
     }
 
+    // Method to close the modal
+    closeModal(event) {
+        this.isModalOpen = false;
+        // check event for closed modal and saved pressed
+        if (event.detail && event.detail.saved) {
+            console.log('Record was saved');
+            // You can perform additional actions here if needed, such as refreshing data
+            console.log('Record was saved: ', event.detail.data.apiName, event.detail.data.id);
+            let rec = this.recordById[event.detail.data.id];
+            rec.Annat_Beskrivning__c = event.detail.data.fields.Annat_Beskrivning__c.value;
+            rec.Ans_kt_V_rde_Kontanter_Presentkort__c = event.detail.data.fields.Ans_kt_V_rde_Kontanter_Presentkort__c.value;
+            rec.Beviljat_V_rde_Presentkort_Kontanter__c = event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value;
+            rec.Kontanter_Presentkort__c = event.detail.data.fields.Kontanter_Presentkort__c.value;
+            rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
+            rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
+            console.log('Updated record: ', JSON.stringify(rec, null, 2));
+            if (!event.detail.data.fields.Kontanter_Presentkort__c.value) {
+                this.selectedRows = this.selectedRows.filter(row => row !== rec.Id);
+            }
+            this.data = this.buildTree();
+        }
+        this.isModalOpen = false;
+    }
+
     loadApplications() {
         debugger;
         apexGetAllApplications()
