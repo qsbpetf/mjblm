@@ -4,11 +4,13 @@
 
 import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
+import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatesApplications';
 
 export default class ApplicationTree extends LightningElement {
 
     @api recordId;
     @api flowApiName = '';
+    @api monthsOld = 12;
 
     @track data = [];
     @track dataById = {};
@@ -29,6 +31,12 @@ export default class ApplicationTree extends LightningElement {
     @track childRecordId = '';
     @track childRecordObjectApiName = '';
     @track childRecordFlowApiName = this.flowApiName;
+
+    @track latestApplications = [];
+    @track urls = [];
+
+
+    // TODO: Add validation, if application is 'Approved' then disable the 'Redigera' button and 'Lägg till nytt bidrag' button
 
     COLUMNS = [
         {
@@ -176,6 +184,9 @@ export default class ApplicationTree extends LightningElement {
                 });
                 if (child) {
                     console.log('Found record: ', child.value);
+                    if (this.record.Bidragsrader__r === undefined || this.record.Bidragsrader__r === null) {
+                        this.record.Bidragsrader__r = [];
+                    }
                     this.record.Bidragsrader__r.push(child.value);
                     this.data = this.buildTree();
                 }
@@ -185,12 +196,54 @@ export default class ApplicationTree extends LightningElement {
 
     connectedCallback() {
         this.getApplication(this.recordId);
+        this.getLatestApplications(this.recordId);
     }
 
     async getApplication(applicationId) {
         this.record = await apexGetApplication({ formId: applicationId });
         console.log('Application: ', this.record, JSON.stringify(this.record, null, 2));
         this.data = this.buildTree();
+    }
+
+    async getLatestApplications(applicationId) {
+        this.latestApplications = await apexGetLatestApplications( {
+            appId: applicationId,
+            monthsOld: this.monthsOld
+        });
+        console.log(this.latestApplications, JSON.stringify(this.latestApplications, null, 2));
+        this.urls = this.latestApplications.map(app => {
+            let obj = {
+                label: app.Name,
+                url: '/application/s/application/' + app.Id
+            };
+            obj.details = this.generateDetails(app);
+            return obj;
+        });
+        console.log(this.urls, JSON.stringify(this.urls, null, 2));
+    }
+
+    generateDetails(app) {
+        let details = '';
+        let childById = {};
+        app.Barnen__r.forEach(child => {
+            child.Bidragsrader__r = [];
+            childById[child.Id] = child;
+        });
+
+        app.Bidragsrader__r.forEach(row => {
+            let child = childById[row.Barnet_ApplicationEntry__c];
+            child.Bidragsrader__r.push(row);
+        });
+
+        app.Barnen__r.forEach(child => {
+            details += '\n' + child.XC_Fornamn__c + ' ' + child.XC_Efternamn__c + ':\n';
+            child.Bidragsrader__r.forEach(row => {
+                details += '   - ' +
+                    row.Kategori__c + (row.Underkategori__c ? ' (' + row.Underkategori__c  + ')' : '') + '  Ansökt: ' +
+                    row.Ans_kt_V_rde_Kontanter_Presentkort__c + '  Beviljat: ' + (row.Beviljat_V_rde_Presentkort_Kontanter__c ? row.Beviljat_V_rde_Presentkort_Kontanter__c : 'saknas') + '\n';
+            });
+        });
+        return details;
     }
 
     buildTree() {

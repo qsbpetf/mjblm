@@ -161,6 +161,74 @@ public inherited sharing class ApplicationFormsService {
         return new List<Contact> (contacts);
     }
 
+    public static List<Application__c> getLatestApplications(Id appId, Integer monthsOld) {
+        Application__c app = [
+            SELECT
+                Id,
+                XC_FormId__c,
+                (
+                    SELECT XC_Personnummer__c
+                    FROM Barnen__r
+                    WHERE XC_Personnummer__c != NULL
+                )
+            FROM
+                Application__c
+            WHERE
+                Id = :appId];
+
+        Set<String> childrenSSN = new Set<String>();
+        for (XC_ApplicationEntryChild__c child : app.Barnen__r) {
+            childrenSSN.add(child.XC_Personnummer__c);
+        }
+
+        List<XC_ApplicationEntryChild__c> children = new List<XC_ApplicationEntryChild__c>([
+            SELECT
+                XC_Application__c
+            FROM
+                XC_ApplicationEntryChild__c
+            WHERE
+                XC_Personnummer__c IN :childrenSSN]);
+
+        Set<Id> applications = new Set<Id>();
+        for (XC_ApplicationEntryChild__c child : children) {
+            applications.add(child.XC_Application__c);
+        }
+        applications.remove(appId);
+
+        Date lastMonthsDate = Date.today().addMonths(-monthsOld);
+        List<Application__c> apps = new List<Application__c>([
+            SELECT
+                Id,
+                Name,
+                XC_Vardnadshavare__c,
+                XC_Vardnadshavare1__c,
+                (SELECT
+                    Id,
+                    Name,
+                    XC_Fornamn__c,
+                    XC_Efternamn__c,
+                    XC_Fodelsear__c,
+                    XC_Personnummer__c
+                FROM Barnen__r),
+                (SELECT
+                    Id,
+                    Name,
+                    Barnet_ApplicationEntry__c,
+                    Kategori__c,
+                    Underkategori__c,
+                    Beviljat_V_rde_Presentkort_Kontanter__c,
+                    Ans_kt_V_rde_Kontanter_Presentkort__c,
+                    Kontanter_Presentkort__c,
+                    Annat_Beskrivning__c
+                FROM Bidragsrader__r)
+            FROM Application__c
+            WHERE Id IN :applications
+            AND XC_Status__c = :STATUS_APPROVED
+            AND CreatedDate >= :lastMonthsDate]);
+
+        return apps;
+    }
+
     public static List<Application__c> getDuplicated(Id appId) {
         Application__c app = [
                 SELECT
@@ -171,12 +239,14 @@ public inherited sharing class ApplicationFormsService {
                         Application__c
                 WHERE
                         Id = :appId];
+
         Set<String> childrensPersonNummers = new Set<String>();
         Set<String> childrensIds = new Set<String>();
         for (XC_ApplicationEntryChild__c child : app.Barnen__r) {
             childrensPersonNummers.add(child.XC_Personnummer__c);
             childrensIds.add(child.Id);
         }
+
         List<XC_ApplicationEntryChild__c> children = [
                 SELECT
                         XC_Application__c
@@ -277,7 +347,7 @@ public inherited sharing class ApplicationFormsService {
     }
 
     private static List<Schema.FieldSetMember> getFields() {
-        return SObjectType.Application__c.FieldSets.Application_Form_Fieldst.getFields();
+        return SObjectType.Application__c.fieldSets.Application_Form_Fieldst.getFields();
     }
 
     public static Application__c initEmptyApp() {

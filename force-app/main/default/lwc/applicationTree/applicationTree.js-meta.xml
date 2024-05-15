@@ -12,6 +12,7 @@
         <targetConfig targets="lightningCommunity__Default">
             <property name="recordId" type="String" label="Record ID" description="The value should be {!recordId}."/>
             <property name="flowApiName" type="String" label="Screen Flow API Name" description="The API name of the screen flow"/>
+            <property name="monthsOld" type="Integer" label="Related Apps last X months" description="Displaying related Applications within last X months" default="12"/>
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

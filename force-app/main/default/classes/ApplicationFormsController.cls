@@ -83,6 +83,16 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
+    public static List<Application__c> getLatesApplications(Id appId, Integer monthsOld) {
+        try {
+            List<Application__c> apps = ApplicationFormsService.getLatestApplications(appId, monthsOld);
+            return apps;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled
     public static Id getCurrentUserAccountId() {
         try {
             Id usrId = ApplicationFormsService.getCurrentUserAccountId();
