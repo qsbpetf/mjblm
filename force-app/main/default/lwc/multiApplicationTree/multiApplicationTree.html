@@ -1,0 +1,39 @@
+<!--
+ - Created by peterfriberg on 2024-05-15.
+ -->
+
+<!-- Multi Application Tree -->
+<template>
+    <lightning-card icon-name="custom:custom55">
+        <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
+
+        <div slot="title" class="slds-grid slds-grid_align-spread">
+            <div>{cardTitle}</div>
+            <div class="slds-grid" style="font-weight:bold">
+                <div class="slds-col slds-col_padded slds-m-left_xx-large slds-text-heading_small">
+                    Totalt Begärt: {totalRequested}
+                </div>
+                <div class="slds-col slds-col_padded slds-m-left_xx-large slds-text-heading_small">
+                    Totalt Beviljat: {totalGranted}
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-m-around_medium">
+            <lightning-tree-grid
+                    data={data}
+                    columns={COLUMNS}
+                    key-field="id"
+                    onrowaction={handleRowClick}
+                    onrowselection={handleRowSelection}
+                    selected-rows={selectedRows}
+            >
+            </lightning-tree-grid>
+
+            <c-bidragsrader-modal record-id={recId} is-open={isModalOpen} onclose={closeModal}></c-bidragsrader-modal>
+
+            <c-screen-flow flow-api-name={childRecordFlowApiName} onclose={handleFlowSubmit}></c-screen-flow>
+        </div>
+
+    </lightning-card>
+</template>
