@@ -4,7 +4,7 @@
 
 import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
-import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatesApplications';
+import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatestApplications';
 
 export default class ApplicationTree extends LightningElement {
 

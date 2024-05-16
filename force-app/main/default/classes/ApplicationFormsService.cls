@@ -2,6 +2,7 @@ public inherited sharing class ApplicationFormsService {
 
     private static final String STATUS_TEMPORARY = 'Temporary';
     private static final String STATUS_NEW = 'New';
+    private static final String STATUS_READY_FOR_DECISION = 'Ready for Decision';
     private static final String STATUS_APPROVED = 'Approved';
     private static final String STATUS_REJECTED = 'Rejected';
     private static final String LF_STATUS_ACTIVE = 'Aktiv';
@@ -227,6 +228,46 @@ public inherited sharing class ApplicationFormsService {
             AND CreatedDate >= :lastMonthsDate]);
 
         return apps;
+    }
+
+    public static List<Application__c> getAllApplications() {
+        User currentUser = [SELECT Contact.AccountId, Contact.Account.Name FROM User WHERE Id = :UserInfo.getUserId()];
+        System.debug('*** Info: ' + currentUser.Contact.AccountId + ' ' + currentUser.Contact.Account.Name + ' ***');
+        List<Application__c> applications = new List<Application__c>([
+            SELECT
+                Id,
+                Name,
+                XC_Status__c,
+                XC_Vardnadshavare__c,
+                XC_Vardnadshavare1__c,
+                XC_Approver1__c,
+                XC_Approver2__c,
+                (SELECT
+                    Id,
+                    Name,
+                    XC_Fornamn__c,
+                    XC_Efternamn__c,
+                    XC_Fodelsear__c,
+                    XC_Personnummer__c,
+                    XC_Application__c
+                FROM Barnen__r),
+                (SELECT
+                    Id,
+                    Name,
+                    Barnet_ApplicationEntry__c,
+                    Kategori__c,
+                    Underkategori__c,
+                    Beviljat_V_rde_Presentkort_Kontanter__c,
+                    Ans_kt_V_rde_Kontanter_Presentkort__c,
+                    Kontanter_Presentkort__c,
+                    Annat_Beskrivning__c,
+                    Application__c
+                FROM Bidragsrader__r)
+            FROM Application__c
+            WHERE
+                XC_LF__c = :currentUser.Contact.AccountId AND
+                XC_Status__c = :STATUS_READY_FOR_DECISION]);
+        return applications;
     }
 
     public static List<Application__c> getDuplicated(Id appId) {
