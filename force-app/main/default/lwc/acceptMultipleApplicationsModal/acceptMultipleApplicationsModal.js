@@ -1,39 +1,35 @@
-import { api } from 'lwc';
+import { api, track} from 'lwc';
 import LightningModal from 'lightning/modal';
-import apexUpdateApplication from '@salesforce/apex/ApplicationFormsController.updateApplication';
+import apexUpdateApplicationsBulk from '@salesforce/apex/ApplicationFormsController.updateApplicationsBulk';
 import apexGetApproversForCurrentUser from '@salesforce/apex/ApplicationFormsController.getApproversForCurrentUser';
-import Labels from './labels';
 
 export default class AcceptMultipleApplicationsModal extends LightningModal {
     
-    applicationIds;
+    @track applicationIds;
+    @track approvers = [];
+    @track error;
+    @track isLoading = false;
+    @track errorMsg = '';
+    @track allApplications = [];
+    @track isValidated = false;
+    @track disabledButton = true;
+    @track disabledCheckbox = true;
 
     @api set recordIds(rids) {
-        this.applicationIds = rids;
-        console.log(rids);
+        this.applicationIds = rids.split(',');
     }
 
     get recordIds(){
         return this.applicationIds;
     }
 
-    labels = Labels;
-    approvers = [];
-    error;
-    isLoading = false;
-    errorMsg = '';
+    form = {
+        XC_Approver1__c: '',
+        XC_Approver2__c: '',
+    }
 
     connectedCallback(){
         this.getApprovers();
-    }
-
-    form = {
-        // Id: '',
-        // XC_AcceptedNotes__c: '',
-        XC_Approver1__c: '',
-        XC_Approver2__c: '',
-        // XC_Kostnad_for_Majblomman__c: 0.0,
-        // XC_ApprovedAmount__c: 0.0
     }
 
     async getApprovers() {
@@ -47,15 +43,28 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     selectApprover(evt) {
         this.errorMsg = '';
         this.form[`XC_Approver${evt.target.dataset.approver}__c`] = evt.target.value;
+        if(evt.target.value === ""){
+            this.disabledCheckbox = true;
+            //TODO: fix checkbox so that it unchecks
+        }
+        else if(this.form.XC_Approver1__c && this.form.XC_Approver2__c){
+            this.disabledCheckbox = false; 
+        }
+        
     }
 
-    inputChange(evt) {
-        this.form[evt.target.dataset.field] = evt.target.value;
+    handleCheckbox(event){
+        this.isValidated = event.target.checked;
+        this.disabledButton = !event.target.checked;
     }
 
-    // validate() {
-    //     this.errorMsg = '';
-    //     let valid = true;
+    // inputChange(evt) {
+    //     this.form[evt.target.dataset.field] = evt.target.value;
+    // }
+
+    validate() {
+         this.errorMsg = '';
+         let valid = true;
     //     this.template.querySelectorAll('[data-validity-check="true"]').forEach(
     //         el => {
     //             if (!el.checkValidity()) {
@@ -64,32 +73,52 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     //             }
     //         }
     //     );
-    //     if (!(this.form.XC_Approver1__c || this.form.XC_Approver2__c)) {
-    //         this.errorMsg = labels.PLEASE_SELECT_ONE_APPROVER;
-    //         valid = false;
-    //     }
+         if (!(this.form.XC_Approver1__c || this.form.XC_Approver2__c)) {
+            this.errorMsg = "Välj godkännare";
+             valid = false;
+         }
 
-    //     return valid;
-    // }
+         return valid;
+     }
 
     async onSave() {
-        // if (!this.validate()) {
-        //     return;
-        // }
+         if (!this.validate()) {
+             return;
+         }
         try {
-            this.isLoading = true;
-            this.form.XC_Status__c = 'Approved';
-            await apexUpdateApplication({ form: this.form });
+            //this.isLoading = true; //turned of for testing
+            this.createApplicationList();
+            console.log(JSON.stringify(this.allApplications));
+
+             // TODO: check if "updateApplicationsBulk" works
+            //await apexUpdateApplicationsBulk({ forms: this.allApplications }); 
+           
         } catch (e) {
-            this.error = JSON.stringify(e);
-            this.close('error');
+             this.error = JSON.stringify(e);
+            // this.close('error'); // turned off for testing
         } finally {
-            this.close('ok')
+            // this.close('ok') // turned off for testing
         }
     }
 
     onCancel() {
         this.close('cancel');
+    }
+
+    createApplicationList(){
+        this.applicationIds.forEach(appId => {
+            let newForm = {
+                Id: appId,
+                XC_Approver1__c: this.form.XC_Approver1__c,
+                XC_Approver2__c: this.form.XC_Approver2__c,
+                XC_Status__c: this.form.XC_Status__c = 'Approved',
+            };
+            this.allApplications.push(newForm);
+        });
+        
+        
+
+
     }
 
 }
