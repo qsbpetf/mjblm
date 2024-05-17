@@ -168,6 +168,20 @@ export default class MultiApplicationTree extends LightningElement {
             .map(row => row.id);
     }
 
+    // open accept multiple applications modal
+    async handleApproveClick(){
+        const result = await AcceptMultipleApplicationsModal.open({
+            size: 'medium',
+            description: 'Approve',
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+
     handleRowClick(event) {
         this.selectedItem = event.detail.row;
         const action = event.detail.action;
