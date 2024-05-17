@@ -31,6 +31,16 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
+    public static void updateApplicationsBulk(List<Application__c> forms) {
+        try {
+            List<Application__c> form1 = forms;
+            ApplicationFormsService.updateApplicationsBulk(form1);
+        } catch (Exception ex) {
+            throw new AuraHandledException(ex.getMessage());
+        }
+    }
+
+    @AuraEnabled
     public static Id createTemporary() {
         try {
             Id res;

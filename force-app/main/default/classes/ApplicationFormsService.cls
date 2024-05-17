@@ -100,6 +100,10 @@ public inherited sharing class ApplicationFormsService {
         update form;
     }
 
+    public static void updateApplicationsBulk(List<Application__c> forms) {
+        update forms;
+    }
+
     public static Id createTemporary() {
         Application__c app = new Application__c(
                 XC_Status__c = STATUS_TEMPORARY,
