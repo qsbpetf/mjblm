@@ -2,41 +2,39 @@ import { api } from 'lwc';
 import LightningModal from 'lightning/modal';
 import apexUpdateApplication from '@salesforce/apex/ApplicationFormsController.updateApplication';
 import apexGetApproversForCurrentUser from '@salesforce/apex/ApplicationFormsController.getApproversForCurrentUser';
-import labels from './labels';
+import Labels from './labels';
 
-export default class AcceptApplication extends LightningModal {
-    //_recordId;
+export default class AcceptMultipleApplicationsModal extends LightningModal {
+    
+    applicationIds;
 
+    @api set recordIds(rids) {
+        this.applicationIds = rids;
+        console.log(rids);
+    }
+
+    get recordIds(){
+        return this.applicationIds;
+    }
+
+    labels = Labels;
     approvers = [];
     error;
     isLoading = false;
     errorMsg = '';
-
-    // @api set recordId(rid) {
-    //     this._recordId = rid;
-    //     this.form.Id = rid;
-    //     this.getApprovers();
-    // }
-
-    // get recordId() {
-    //     return this._recordId;
-    // }
 
     connectedCallback(){
         this.getApprovers();
     }
 
     form = {
-        Id: '',
-        XC_AcceptedNotes__c: '',
+        // Id: '',
+        // XC_AcceptedNotes__c: '',
         XC_Approver1__c: '',
         XC_Approver2__c: '',
-        XC_Kostnad_for_Majblomman__c: 0.0,
-        XC_ApprovedAmount__c: 0.0
+        // XC_Kostnad_for_Majblomman__c: 0.0,
+        // XC_ApprovedAmount__c: 0.0
     }
-
-    
-
 
     async getApprovers() {
         try {

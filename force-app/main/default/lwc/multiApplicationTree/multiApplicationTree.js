@@ -173,6 +173,7 @@ export default class MultiApplicationTree extends LightningElement {
         const result = await AcceptMultipleApplicationsModal.open({
             size: 'medium',
             description: 'Approve',
+            recordIds: `${this.selectedRows}`,
         });
 
         if (result === 'ok') {

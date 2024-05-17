@@ -1,16 +1,16 @@
 <template>
-    <lightning-modal-header label={labels.APPROVE}></lightning-modal-header>
+    <lightning-modal-header label="Godkänn Ansökningar"></lightning-modal-header>
     <lightning-modal-body>
         <lightning-spinner if:true={isLoading} size="medium"></lightning-spinner>
         <label for="approver1" class="slds-form-element__label slds-no-flex">
-            {labels.SELECT_FIRST_APPROVER}
+            "Godkänt av 1"
         </label>
         <select id="approver1" data-approver="1" class="slds-select" onchange={selectApprover}>
             <option value="">---</option>
             <option for:each={approvers} for:item="approver" value={approver.Id} key={approver.Id}>{approver.Name}</option>
         </select>
         <label for="approver2" class="slds-form-element__label slds-no-flex">
-            {labels.SELECT_SECOND_APPROVER}
+            "Godkänt av 2"
         </label>
         <select id="approver2" data-approver="2" class="slds-select" onchange={selectApprover}>
             <option value="">---</option>
