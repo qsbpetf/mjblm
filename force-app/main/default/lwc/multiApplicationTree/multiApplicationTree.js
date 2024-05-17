@@ -4,6 +4,7 @@
 
 import { LightningElement, track, api } from 'lwc';
 import apexGetAllApplications from '@salesforce/apex/ApplicationFormsController.getAllApplications';
+import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
 
 export default class MultiApplicationTree extends LightningElement {
     @api flowApiName = '';
@@ -27,6 +28,7 @@ export default class MultiApplicationTree extends LightningElement {
     @track childRecordObjectApiName = '';
     @track childRecordFlowApiName = this.flowApiName;
     @track isModalOpen = false; // Used to control the visibility of modal
+    @track disabledButton = true; 
 
     COLUMNS = [
         {
@@ -117,6 +119,8 @@ export default class MultiApplicationTree extends LightningElement {
     handleRowSelection(event) {
         const eventAction = event.detail.config.action;
         const selectedRowId = event.detail.config.value;
+        //console.log(JSON.stringify(this.selectedRows));
+        //console.log(JSON.stringify(event.detail.config.action));
 
         if (eventAction === 'rowSelect') {
             let selectedRow = this.findSelectedRow(event, selectedRowId);
@@ -128,10 +132,20 @@ export default class MultiApplicationTree extends LightningElement {
                     this.selectedRows = this.keepSelection(event);
                     alert('Du kan bara välja färdigbehandlade ansökningar');
                 }
+                else{
+                    this.selectedRows = this.keepSelection(event);
+                    this.disabledButton = this.selectedRows.length === 0;
+                }
             }
         } else if (eventAction === 'selectAllRows') {
             this.selectedRows = this.keepSelection(event);
+            this.disabledButton = this.selectedRows.length === 0;
         }
+        else if(eventAction === 'rowDeselect' || eventAction === 'deselectAllRows'){
+            this.selectedRows = [];
+            this.disabledButton = true;
+        }
+        //console.log(JSON.stringify(this.selectedRows));
     }
 
     validateApp(row) {

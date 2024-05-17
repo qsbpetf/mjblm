@@ -7,6 +7,9 @@
     <lightning-card icon-name="custom:custom55">
         <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
 
+        <div class="slds-grid slds-grid_align-end slds-col_padded slds-p-right_medium">
+            <lightning-button variant="brand" label="Godkänn Ansökningar" title="Bevilja valda ansökningar" onclick={handleApproveClick} class="" disabled={disabledButton}></lightning-button>
+        </div>          
         <div slot="title" class="slds-grid slds-grid_align-spread">
             <div>{cardTitle}</div>
             <div class="slds-grid" style="font-weight:bold">
