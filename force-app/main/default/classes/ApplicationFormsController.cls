@@ -93,6 +93,16 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
+    public static List<Contact> getApproversForCurrentUser(){
+        try {
+            List<Contact> approvers = ApplicationFormsService.getApproversForCurrentUser();
+            return approvers;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled
     public static List<Application__c> getLatestApplications(Id appId, Integer monthsOld) {
         try {
             List<Application__c> apps = ApplicationFormsService.getLatestApplications(appId, monthsOld);
