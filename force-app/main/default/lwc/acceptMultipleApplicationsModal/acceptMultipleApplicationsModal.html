@@ -5,52 +5,25 @@
         <label for="approver1" class="slds-form-element__label slds-no-flex">
             "Godkänt av 1"
         </label>
-        <select id="approver1" data-approver="1" class="slds-select" onchange={selectApprover}>
+        <select id="approver1" disabled={disabledSelect} data-approver="1" class="slds-select" onchange={selectApprover}>
             <option value="">---</option>
             <option for:each={approvers} for:item="approver" value={approver.Id} key={approver.Id}>{approver.Name}</option>
         </select>
         <label for="approver2" class="slds-form-element__label slds-no-flex">
             "Godkänt av 2"
         </label>
-        <select id="approver2" data-approver="2" class="slds-select" onchange={selectApprover}>
+        <select id="approver2" disabled={disabledSelect} data-approver="2" class="slds-select" onchange={selectApprover}>
             <option value="">---</option>
             <option for:each={approvers} for:item="approver" value={approver.Id} key={approver.Id}>{approver.Name}</option>
         </select>
         <span class="xc-error" if:true={errorMsg.length}>{errorMsg}</span>
         <lightning-input class="slds-form-element__label slds-no-flex" type="checkbox" disabled={disabledCheckbox} label="Ja, jag vill godkänna alla markerade ansökningar med angivna belopp" value={isValidated} onchange={handleCheckbox}> </lightning-input>
-        <!-- <lightning-input
-                data-validity-check="true"
-                required
-                min="0.01"
-                step="0.01"
-                data-field="XC_ApprovedAmount__c"
-                value={form.XC_ApprovedAmount__c}
-                type="number"
-                field-level-help="Beviljat belopp - t ex presentkortets värde för den sökande."
-                placeholder={labels.APPROVED_AMOUNT}
-                label="Beviljat belopp (kr)"
-                onchange={inputChange}></lightning-input>
-        <lightning-input
-                data-validity-check="true"
-                required
-                min="0.00"
-                step="0.01"
-                data-field="XC_Kostnad_for_Majblomman__c"
-                value={form.XC_Kostnad_for_Majblomman__c}
-                type="number"
-                placeholder="Kostnad för Majblomman (kr)"
-                label="Kostnad för Majblomman (kr)"
-                onchange={inputChange}></lightning-input>
-        <lightning-textarea
-                data-validity-check="true"
-                required=true
-                label={labels.ACCEPTED_NOTES_REASONS}
-                id="formRequest"
-                data-field="XC_AcceptedNotes__c"
-                value={form.XC_AcceptedNotes__c}
-                type="text"
-                onchange={inputChange}
-                style="display: block;"></lightning-textarea> -->
+        <br/>
+        <template if:true={isValidated}>
+            <p>
+                <lightning-formatted-rich-text value={infoText}></lightning-formatted-rich-text>
+            </p>
+        </template>
     </lightning-modal-body>
     <lightning-modal-footer>
         <lightning-button

@@ -9,11 +9,13 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     @track approvers = [];
     @track error;
     @track isLoading = false;
-    @track errorMsg = '';
+    @track errorMsg = ''; // not in use as of now
     @track allApplications = [];
     @track isValidated = false;
     @track disabledButton = true;
     @track disabledCheckbox = true;
+    @track disabledSelect = false;
+    
 
     @api set recordIds(rids) {
         this.applicationIds = rids.split(',');
@@ -21,6 +23,13 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
 
     get recordIds(){
         return this.applicationIds;
+    }
+
+    get infoText(){
+        return `<strong>Du har valt att godkänna de markerade ansökningarna. Var vänlig notera följande:</strong><br>
+        1. Godkända ansökningar kommer att försvinna från listvyn: Du kommer inte längre att kunna se eller hantera dessa ansökningar i den nuvarande vyn.<br>
+        2. Åtgärden kan inte ångras: När ansökningarna har godkänts, kan denna åtgärd inte ångras eller ändras utan att kontakta Riksförbundet.<br>
+        <strong>Är du säker på att du vill fortsätta med att godkänna alla markerade ansökningar?</strong>`;
     }
 
     form = {
@@ -41,11 +50,10 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     }
 
     selectApprover(evt) {
-        this.errorMsg = '';
         this.form[`XC_Approver${evt.target.dataset.approver}__c`] = evt.target.value;
         if(evt.target.value === ""){
             this.disabledCheckbox = true;
-            //TODO: fix checkbox so that it unchecks
+
         }
         else if(this.form.XC_Approver1__c && this.form.XC_Approver2__c){
             this.disabledCheckbox = false; 
@@ -55,38 +63,13 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
 
     handleCheckbox(event){
         this.isValidated = event.target.checked;
+        this.disabledSelect = event.target.checked;
         this.disabledButton = !event.target.checked;
     }
 
-    // inputChange(evt) {
-    //     this.form[evt.target.dataset.field] = evt.target.value;
-    // }
-
-    validate() {
-         this.errorMsg = '';
-         let valid = true;
-    //     this.template.querySelectorAll('[data-validity-check="true"]').forEach(
-    //         el => {
-    //             if (!el.checkValidity()) {
-    //                 el.reportValidity();
-    //                 valid = false;
-    //             }
-    //         }
-    //     );
-         if (!(this.form.XC_Approver1__c || this.form.XC_Approver2__c)) {
-            this.errorMsg = "Välj godkännare";
-             valid = false;
-         }
-
-         return valid;
-     }
-
     async onSave() {
-         if (!this.validate()) {
-             return;
-         }
         try {
-            //this.isLoading = true; //turned of for testing
+            this.isLoading = true;
             this.createApplicationList();
             console.log(JSON.stringify(this.allApplications));
 
@@ -94,10 +77,10 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
             //await apexUpdateApplicationsBulk({ forms: this.allApplications }); 
            
         } catch (e) {
-             this.error = JSON.stringify(e);
-            // this.close('error'); // turned off for testing
+            this.error = JSON.stringify(e);
+            this.close('error');
         } finally {
-            // this.close('ok') // turned off for testing
+            this.close('ok')
         }
     }
 
