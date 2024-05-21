@@ -33,8 +33,7 @@ public without sharing class ApplicationFormsController {
     @AuraEnabled
     public static void updateApplicationsBulk(List<Application__c> forms) {
         try {
-            List<Application__c> form1 = forms;
-            ApplicationFormsService.updateApplicationsBulk(form1);
+            ApplicationFormsService.updateApplicationsBulk(forms);
         } catch (Exception ex) {
             throw new AuraHandledException(ex.getMessage());
         }

@@ -102,6 +102,7 @@ public inherited sharing class ApplicationFormsService {
 
     public static void updateApplicationsBulk(List<Application__c> forms) {
         update forms;
+        System.debug('*** Updated applications:' + forms);
     }
 
     public static Id createTemporary() {

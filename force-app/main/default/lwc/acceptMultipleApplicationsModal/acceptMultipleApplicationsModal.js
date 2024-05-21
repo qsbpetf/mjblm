@@ -21,7 +21,7 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
         this.applicationIds = rids.split(',');
     }
 
-    get recordIds(){
+    get recordIds() {
         return this.applicationIds;
     }
 
@@ -51,14 +51,11 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
 
     selectApprover(evt) {
         this.form[`XC_Approver${evt.target.dataset.approver}__c`] = evt.target.value;
-        if(evt.target.value === ""){
+        if (evt.target.value === "") {
             this.disabledCheckbox = true;
-
-        }
-        else if(this.form.XC_Approver1__c && this.form.XC_Approver2__c){
+        } else if (this.form.XC_Approver1__c && this.form.XC_Approver2__c) {
             this.disabledCheckbox = false; 
         }
-        
     }
 
     handleCheckbox(event){
@@ -71,11 +68,7 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
         try {
             this.isLoading = true;
             this.createApplicationList();
-            console.log(JSON.stringify(this.allApplications));
-
-             // TODO: check if "updateApplicationsBulk" works
-            //await apexUpdateApplicationsBulk({ forms: this.allApplications }); 
-           
+            await apexUpdateApplicationsBulk({ forms: this.allApplications });
         } catch (e) {
             this.error = JSON.stringify(e);
             this.close('error');
@@ -89,19 +82,13 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     }
 
     createApplicationList(){
-        this.applicationIds.forEach(appId => {
-            let newForm = {
+        this.allApplications = this.applicationIds.map(appId => {
+            return {
                 Id: appId,
                 XC_Approver1__c: this.form.XC_Approver1__c,
                 XC_Approver2__c: this.form.XC_Approver2__c,
                 XC_Status__c: this.form.XC_Status__c = 'Approved',
             };
-            this.allApplications.push(newForm);
         });
-        
-        
-
-
     }
-
 }
