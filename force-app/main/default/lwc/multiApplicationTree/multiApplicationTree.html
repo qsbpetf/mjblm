@@ -8,7 +8,18 @@
         <lightning-spinner if:true={isLoading} alternative-text="Loading" size="medium"></lightning-spinner>
 
         <div class="slds-grid slds-grid_align-end slds-col_padded slds-p-right_medium">
-            <lightning-button variant="brand" label="Godkänn Ansökningar" title="Bevilja valda ansökningar" onclick={handleApproveClick} class="" disabled={disabledButton}></lightning-button>
+            <lightning-button variant="brand" label={approveButtonLabel} title="Bevilja valda ansökningar" onclick={handleApproveClick} class="" disabled={disabledButton}></lightning-button>
+        </div>
+
+        <div class="container"></div>
+        <div class="slds-m-around_medium">
+            <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
+                <lightning-button disabled={isFirstPage} label="|< Första sidan" onclick={handleFirstPage} variant="neutral"></lightning-button>
+                <lightning-button disabled={isFirstPage} label="<< Föregående sida" onclick={handlePreviousPage} variant="neutral"></lightning-button>
+                <div class="slds-align_absolute-center">Sida {currentPage} av {totalPages}</div>
+                <lightning-button disabled={isLastPage} label="Nästa sida >>" onclick={handleNextPage} variant="neutral"></lightning-button>
+                <lightning-button disabled={isLastPage} label="Sista Sidan >|" onclick={handleLastPage} variant="neutral"></lightning-button>
+            </div>
         </div>
 
         <div slot="title" class="slds-grid slds-grid_align-spread">
@@ -25,12 +36,13 @@
 
         <div class="slds-m-around_medium">
             <lightning-tree-grid
-                    data={data}
+                    data={pageData}
                     columns={COLUMNS}
                     key-field="id"
                     onrowaction={handleRowClick}
                     onrowselection={handleRowSelection}
-                    selected-rows={selectedRows}
+                    selected-rows={pageSelectedRows}
+                    expanded-rows={currentExpandedRows}
             >
             </lightning-tree-grid>
 

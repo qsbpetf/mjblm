@@ -9,15 +9,19 @@ import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 export default class MultiApplicationTree extends LightningElement {
     @api flowApiName = '';
-    @api pageSize = 15
+    @api pageSize = 15;
 
     @track selectedRows = [];
+    @track pageSelectedRows = [];
+    @track selectedRowsCount = 0;
     @track applications = [];
     @track isLoading = true;
 
     @track data = [];
     @track dataById = {};
     @track recordById = {};
+    @track pageData = [];
+    @track currentExpandedRows = [];
 
     @track totalRequested = 0;
     @track totalGranted = 0;
@@ -29,7 +33,14 @@ export default class MultiApplicationTree extends LightningElement {
     @track childRecordObjectApiName = '';
     @track childRecordFlowApiName = this.flowApiName;
     @track isModalOpen = false; // Used to control the visibility of modal
-    @track disabledButton = true; 
+    @track disabledButton = true;
+
+    @track currentPage = 1;
+    @track totalPages = 1;
+    @track isFirstPage = true;
+    @track isLastPage = true;
+    @track recordCount = 0;
+    @track skip = 0;
 
     COLUMNS = [
         {
@@ -117,11 +128,13 @@ export default class MultiApplicationTree extends LightningElement {
         return 'Ansökningar: ' + this.applications.length;
     }
 
+    get approveButtonLabel() {
+        return 'Godkänn ' + this.selectedRowsCount + ' ansökningar';
+    }
+
     handleRowSelection(event) {
         const eventAction = event.detail.config.action;
         const selectedRowId = event.detail.config.value;
-        //console.log(JSON.stringify(this.selectedRows));
-        //console.log(JSON.stringify(event.detail.config.action));
 
         if (eventAction === 'rowSelect') {
             let selectedRow = this.findSelectedRow(event, selectedRowId);
@@ -130,24 +143,49 @@ export default class MultiApplicationTree extends LightningElement {
                 alert('Du kan bara välja ansökningsrad(er)');
             } else if (selectedRow.level === 1) {
                 if (!this.validateApp(selectedRow)) {
-                    this.selectedRows = this.keepSelection(event);
+                    this.selectedRows = [
+                        ...new Set([
+                            ...this.selectedRows,
+                            ...this.keepSelection(event)
+                        ])
+                    ];
                     alert('Du kan bara välja färdigbehandlade ansökningar');
                 }
                 else {
-                     this.selectedRows = this.keepSelection(event);
+                    this.selectedRows = [
+                        ...new Set([
+                            ...this.selectedRows,
+                            ...this.keepSelection(event)
+                        ])
+                    ];
                 }
             }
         } else if (eventAction === 'selectAllRows') {
-            this.selectedRows = this.keepSelection(event);
+            this.selectedRows = [
+                ...new Set([
+                    ...this.selectedRows,
+                    ...this.keepSelection(event)
+                ])
+            ];
         }
         else if (eventAction === 'deselectAllRows') {
-            this.selectedRows = [];
+            // Get IDs from pageData
+            const pageDataIds = this.pageData.map(data => data.id);
+            // Remove IDs found in pageData from selectedRows
+            this.selectedRows = this.selectedRows.filter(id => !pageDataIds.includes(id));
+            // Clear pageSelectedRows
+            this.pageSelectedRows = [];
         }
         else if (eventAction === 'rowDeselect') {
-            this.selectedRows = event.detail.selectedRows.map(row => row.id);
+            // Get the id of the deselected row
+            const deselectedRowId = event.detail.config.value;
+
+            // Remove the deselected row from this.selectedRows
+            this.selectedRows = this.selectedRows.filter(id => id !== deselectedRowId);
         }
-        //console.log(JSON.stringify(this.selectedRows));
+        this.pageSelectedRows = this.selectedRows.filter(row => this.pageData.find(data => data.id === row));
         this.disabledButton = (this.selectedRows.length === 0);
+        this.selectedRowsCount = this.selectedRows.length;
     }
 
     validateApp(row) {
@@ -216,19 +254,6 @@ export default class MultiApplicationTree extends LightningElement {
         console.log('openModal() calling for record id: ' + this.recId);
     }
 
-    openScreeenFlowModal(recId) {
-        this.childRecordId = recId;
-        this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
-        this.childRecordFlowApiName = this.flowApiName;
-        debugger;
-        // find c-screen-flow component and call startFlow() method
-        const flowComponent = this.template.querySelector('c-screen-flow');
-        flowComponent.handleStartFlow({
-            recordId: this.childRecordId,
-            objectApiName: this.childRecordObjectApiName
-        });
-    }
-
     // Method to close the modal
     closeModal(event) {
         this.isModalOpen = false;
@@ -253,6 +278,54 @@ export default class MultiApplicationTree extends LightningElement {
         this.isModalOpen = false;
     }
 
+    openScreeenFlowModal(childRecId) {
+        this.childRecordId = childRecId;
+        this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
+        this.childRecordFlowApiName = this.flowApiName;
+        debugger;
+        // find c-screen-flow component and call startFlow() method
+        const flowComponent = this.template.querySelector('c-screen-flow');
+        flowComponent.handleStartFlow({
+            recordId: this.childRecordId,
+            objectApiName: this.childRecordObjectApiName
+        });
+    }
+
+    handleFlowSubmit(event) {
+        console.log('handleSubmit() called');
+        console.log(event.detail)
+        // check event for closed modal and saved pressed
+        if (event.detail && event.detail.saved) {
+            console.log('Record was saved', event.detail);
+            console.log('Errors: ', event.detail.errors);
+            console.log('Output Variables: ', event.detail.data.outputVariables);
+            if (event.detail.data.outputVariables) {
+                let child = event.detail.data.outputVariables.find(item => {
+                    return (item.dataType === 'SOBJECT' && item.name === 'New_Request_Record' && item.objectType === 'Bidragsrader__c');
+                });
+                if (child) {
+                    console.log('Found record: ', child.value);
+                    let app = this.apps[child.value.Application__c];
+                    console.log('Found app: ', app);
+
+                    if (app.Bidragsrader__r === undefined || app.Bidragsrader__r === null) {
+                        app.Bidragsrader__r = [];
+                    }
+                    app.Bidragsrader__r.push(child.value);
+                    this.updateTree(app, child.value);
+                    let currentExpandedRows = this.getExpandedRows();
+                    currentExpandedRows.push(child.value.Barnet_ApplicationEntry__c);
+                    this.currentExpandedRows = currentExpandedRows;
+                }
+            }
+        }
+    }
+
+    getExpandedRows(e) {
+        const grid = this.template.querySelector('lightning-tree-grid');
+        return grid.getCurrentExpandedRows();
+    }
+
     loadApplications() {
         debugger;
         apexGetAllApplications()
@@ -261,11 +334,57 @@ export default class MultiApplicationTree extends LightningElement {
                 this.applications = result;
                 console.log('Loaded applications: ', this.applications?.length);
                 this.data = this.buildTree();
+                this.paginate();
+
             })
             .catch(error => {
                 this.isLoading = false;
                 console.error('Error loading applications', error);
             });
+    }
+
+    paginate() {
+        debugger;
+        this.pageData = this.data.slice(this.skip, this.pageSize + this.skip);
+        this.isFirstPage = this.currentPage === 1;
+        this.isLastPage = this.currentPage === this.totalPages;
+        this.pageSelectedRows = this.selectedRows.filter(row => this.pageData.find(data => data.id === row));
+    }
+
+    handleNextPage() {
+        console.log('Nästa...');
+        if (this.currentPage < this.totalPages) {
+            this.currentPage++;
+            this.skip = (this.currentPage - 1) * this.pageSize;
+            this.paginate();
+        }
+    }
+
+    handleLastPage() {
+        console.log('Sista...');
+        if (this.currentPage < this.totalPages) {
+            this.currentPage = this.totalPages;
+            this.skip = (this.currentPage - 1) * this.pageSize;
+            this.paginate();
+        }
+    }
+
+    handlePreviousPage() {
+        console.log('Föregående...');
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.skip = (this.currentPage - 1) * this.pageSize;
+            this.paginate();
+        }
+    }
+
+    handleFirstPage() {
+        console.log('Första...');
+        if (this.currentPage > 1) {
+            this.currentPage = 1;
+            this.skip = (this.currentPage - 1) * this.pageSize;
+            this.paginate();
+        }
     }
 
     buildTree() {
@@ -281,10 +400,18 @@ export default class MultiApplicationTree extends LightningElement {
             return treeData;
         }
 
+        console.log('pageSize = ', this.pageSize);
+        this.recordCount = this.applications.length;
+        this.totalPages = Math.ceil(this.recordCount / this.pageSize);
+        this.isFirstPage = this.currentPage === 1;
+        this.isLastPage = this.currentPage === this.totalPages;
+        this.skip = (this.currentPage - 1) * this.pageSize;
+
         this.applications.forEach(app => {
             let appNode = {
                 id: app.Id,
                 name: app.Name,
+                originalName: app.Name,
                 url: "/application/s/detail/" + app.Id,
                 request: 0,
                 granted: 0,
@@ -302,7 +429,9 @@ export default class MultiApplicationTree extends LightningElement {
             app.Barnen__r.forEach(child => {
                 let childNode = {
                     id: child.Id,
+                    appId: app.Id,
                     name: child.Name,
+                    originalName: child.Name,
                     url: "/application/s/detail/" + child.Id,
                     firstName: child.XC_Fornamn__c,
                     lastName: child.XC_Efternamn__c,
@@ -354,18 +483,18 @@ export default class MultiApplicationTree extends LightningElement {
             }
 
             let appNode = this.apps[app.Id];
-            appNode.name = appNode.name + ' (' + appNode._children.length + ') ' + appNode.grantedDefinedCount + '/' + appNode.grantedTotalCount;
+            appNode.name = appNode.originalName + ' (' + appNode._children.length + ') ' + appNode.grantedDefinedCount + '/' + appNode.grantedTotalCount;
 
             app.Barnen__r.forEach(child => {
                 let childNode = this.barn[child.Id];
-                childNode.name = childNode.name + ' ' + childNode.grantedDefinedCount + '/' + childNode.grantedTotalCount;
+                childNode.name = childNode.originalName + ' ' + childNode.grantedDefinedCount + '/' + childNode.grantedTotalCount;
             });
         });
 
         Object.entries(this.apps).forEach(([key, app]) => {
-            console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount);
+            // console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount);
             app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
-            console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount, ' Status icon=', app.statusIcon);
+            // console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount, ' Status icon=', app.statusIcon);
         });
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
@@ -373,6 +502,65 @@ export default class MultiApplicationTree extends LightningElement {
         this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
+    }
+
+    updateTree(app, request) {
+        let childNode = this.barn[request.Barnet_ApplicationEntry__c];
+        let reqNode = {
+            id: request.Id,
+            name: request.Name,
+            category: request.Kategori__c,
+            subCategory: request.Underkategori__c,
+            request: request.Ans_kt_V_rde_Kontanter_Presentkort__c,
+            granted: request.Beviljat_V_rde_Presentkort_Kontanter__c,
+            paymentType: request.Kontanter_Presentkort__c,
+            description: request.Annat_Beskrivning__c,
+            action: 'Redigera',
+            icon: 'utility:edit',
+        };
+        childNode._children.push(reqNode);
+        this.recalculateTree();
+        this.paginate();
+    }
+
+    // Method for recalculating the total requested and granted amounts for the total tree
+    recalculateTree() {
+        this._totalRequested = 0;
+        this._totalGranted = 0;
+        Object.entries(this.apps).forEach(([key, app]) => {
+            app.request = 0;
+            app.granted = 0;
+            app.grantedDefinedCount = 0;
+            app.grantedTotalCount = 0;
+            app._children.forEach(child => {
+                child.request = 0;
+                child.granted = 0;
+                child.grantedDefinedCount = 0;
+                child.grantedTotalCount = 0;
+                child._children.forEach(request => {
+                    child.request += this.asData(request.request);
+                    child.granted += this.asData(request.granted);
+                    child.grantedDefinedCount += this.asCount(request.granted);
+                    child.grantedTotalCount += 1;
+                    this._totalRequested += this.asData(request.request);
+                    this._totalGranted += this.asData(request.granted);
+                    app.request += this.asData(request.request);
+                    app.granted += this.asData(request.granted);
+                    app.grantedDefinedCount += this.asCount(request.granted);
+                    app.grantedTotalCount += 1;
+                });
+                child.name = child.originalName + ' ' + child.grantedDefinedCount + '/' + child.grantedTotalCount;
+            });
+            app.name = app.originalName + ' (' + app._children.length + ') ' + app.grantedDefinedCount + '/' + app.grantedTotalCount;
+        });
+
+        Object.entries(this.apps).forEach(([key, app]) => {
+            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
+        });
+
+        const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.totalRequested = formatter.format(this._totalRequested);
+        this.totalGranted = formatter.format(this._totalGranted);
     }
 
     asData(param) {
