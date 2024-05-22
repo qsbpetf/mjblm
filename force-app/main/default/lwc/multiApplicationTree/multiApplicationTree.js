@@ -18,7 +18,6 @@ export default class MultiApplicationTree extends LightningElement {
     @track isLoading = true;
 
     @track data = [];
-    @track dataById = {};
     @track recordById = {};
     @track pageData = [];
     @track currentExpandedRows = [];
@@ -391,16 +390,11 @@ export default class MultiApplicationTree extends LightningElement {
         let treeData = [];
         this.apps = {};
         this.barn = {};
-        this._totalRequested = 0;
-        this._totalGranted = 0;
-
-        debugger;
 
         if (this.applications === undefined || this.applications === null) {
             return treeData;
         }
 
-        console.log('pageSize = ', this.pageSize);
         this.recordCount = this.applications.length;
         this.totalPages = Math.ceil(this.recordCount / this.pageSize);
         this.isFirstPage = this.currentPage === 1;
@@ -466,35 +460,14 @@ export default class MultiApplicationTree extends LightningElement {
                     };
                     let child = this.barn[request.Barnet_ApplicationEntry__c];
                     child._children.push(reqNode);
-                    child.request += this.asData(reqNode.request);
-                    child.granted += this.asData(reqNode.granted);
-                    child.grantedDefinedCount += this.asCount(reqNode.granted)
-                    child.grantedTotalCount += 1;
-                    this._totalRequested += this.asData(reqNode.request);
-                    this._totalGranted += this.asData(reqNode.granted);
-                    this.dataById[request.Id] = reqNode;
                     this.recordById[request.Id] = request;
-                    let appNode = this.apps[request.Application__c];
-                    appNode.request += this.asData(reqNode.request);
-                    appNode.granted += this.asData(reqNode.granted);
-                    appNode.grantedDefinedCount += this.asCount(reqNode.granted);
-                    appNode.grantedTotalCount += 1;
                 });
             }
-
-            let appNode = this.apps[app.Id];
-            appNode.name = appNode.originalName + ' (' + appNode._children.length + ') ' + appNode.grantedDefinedCount + '/' + appNode.grantedTotalCount;
-
-            app.Barnen__r.forEach(child => {
-                let childNode = this.barn[child.Id];
-                childNode.name = childNode.originalName + ' ' + childNode.grantedDefinedCount + '/' + childNode.grantedTotalCount;
-            });
+            this.recalculateTree();
         });
 
         Object.entries(this.apps).forEach(([key, app]) => {
-            // console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount);
             app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
-            // console.log('App: Total grant count=', app.grantedTotalCount, ' Defined grant count=', app.grantedDefinedCount, ' Status icon=', app.statusIcon);
         });
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });

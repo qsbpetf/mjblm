@@ -15,9 +15,9 @@
         <div class="slds-m-around_medium">
             <div class="slds-grid slds-grid_align-spread slds-m-bottom_small">
                 <lightning-button disabled={isFirstPage} label="|< Första sidan" onclick={handleFirstPage} variant="neutral"></lightning-button>
-                <lightning-button disabled={isFirstPage} label="<< Föregående sida" onclick={handlePreviousPage} variant="neutral"></lightning-button>
+                <lightning-button disabled={isFirstPage} label="<< Föregående sida" onclick={handlePreviousPage} variant="neutral" class="slds-m-left_x-small"></lightning-button>
                 <div class="slds-align_absolute-center">Sida {currentPage} av {totalPages}</div>
-                <lightning-button disabled={isLastPage} label="Nästa sida >>" onclick={handleNextPage} variant="neutral"></lightning-button>
+                <lightning-button disabled={isLastPage} label="Nästa sida >>" onclick={handleNextPage} variant="neutral"  class="slds-m-right_x-small"></lightning-button>
                 <lightning-button disabled={isLastPage} label="Sista Sidan >|" onclick={handleLastPage} variant="neutral"></lightning-button>
             </div>
         </div>
