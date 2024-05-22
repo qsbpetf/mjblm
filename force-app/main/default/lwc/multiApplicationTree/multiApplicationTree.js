@@ -4,6 +4,8 @@
 
 import { LightningElement, track, api } from 'lwc';
 import apexGetAllApplications from '@salesforce/apex/ApplicationFormsController.getAllApplications';
+import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
+import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
 export default class MultiApplicationTree extends LightningElement {
     @api flowApiName = '';
@@ -27,6 +29,7 @@ export default class MultiApplicationTree extends LightningElement {
     @track childRecordObjectApiName = '';
     @track childRecordFlowApiName = this.flowApiName;
     @track isModalOpen = false; // Used to control the visibility of modal
+    @track disabledButton = true; 
 
     COLUMNS = [
         {
@@ -117,6 +120,8 @@ export default class MultiApplicationTree extends LightningElement {
     handleRowSelection(event) {
         const eventAction = event.detail.config.action;
         const selectedRowId = event.detail.config.value;
+        //console.log(JSON.stringify(this.selectedRows));
+        //console.log(JSON.stringify(event.detail.config.action));
 
         if (eventAction === 'rowSelect') {
             let selectedRow = this.findSelectedRow(event, selectedRowId);
@@ -128,10 +133,21 @@ export default class MultiApplicationTree extends LightningElement {
                     this.selectedRows = this.keepSelection(event);
                     alert('Du kan bara välja färdigbehandlade ansökningar');
                 }
+                else {
+                     this.selectedRows = this.keepSelection(event);
+                }
             }
         } else if (eventAction === 'selectAllRows') {
             this.selectedRows = this.keepSelection(event);
         }
+        else if (eventAction === 'deselectAllRows') {
+            this.selectedRows = [];
+        }
+        else if (eventAction === 'rowDeselect') {
+            this.selectedRows = event.detail.selectedRows.map(row => row.id);
+        }
+        //console.log(JSON.stringify(this.selectedRows));
+        this.disabledButton = (this.selectedRows.length === 0);
     }
 
     validateApp(row) {
@@ -152,6 +168,30 @@ export default class MultiApplicationTree extends LightningElement {
         return event.detail.selectedRows
             .filter(row => this.validateApp(row))
             .map(row => row.id);
+    }
+
+    // open accept multiple applications modal
+    async handleApproveClick(){
+        const result = await AcceptMultipleApplicationsModal.open({
+            size: 'medium',
+            description: 'Approve',
+            recordIds: `${this.selectedRows}`,
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+
+    showNotification(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+        this.dispatchEvent(evt);
     }
 
     handleRowClick(event) {
@@ -205,8 +245,8 @@ export default class MultiApplicationTree extends LightningElement {
             rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
             rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
-            if (!event.detail.data.fields.Kontanter_Presentkort__c.value) {
-                this.selectedRows = this.selectedRows.filter(row => row !== rec.Id);
+            if (this.asCount(event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value) === 0) {
+                this.selectedRows = this.selectedRows.filter(row => row !== rec.Application__c);
             }
             this.data = this.buildTree();
         }
@@ -297,18 +337,18 @@ export default class MultiApplicationTree extends LightningElement {
                     };
                     let child = this.barn[request.Barnet_ApplicationEntry__c];
                     child._children.push(reqNode);
-                    child.request += reqNode.request || 0;
-                    child.granted += reqNode.granted || 0;
-                    child.grantedDefinedCount += (reqNode.granted) ? 1 : 0;
+                    child.request += this.asData(reqNode.request);
+                    child.granted += this.asData(reqNode.granted);
+                    child.grantedDefinedCount += this.asCount(reqNode.granted)
                     child.grantedTotalCount += 1;
-                    this._totalRequested += reqNode.request || 0;
-                    this._totalGranted += reqNode.granted || 0;
+                    this._totalRequested += this.asData(reqNode.request);
+                    this._totalGranted += this.asData(reqNode.granted);
                     this.dataById[request.Id] = reqNode;
                     this.recordById[request.Id] = request;
                     let appNode = this.apps[request.Application__c];
-                    appNode.request += reqNode.request || 0;
-                    appNode.granted += reqNode.granted || 0;
-                    appNode.grantedDefinedCount += (reqNode.granted) ? 1 : 0;
+                    appNode.request += this.asData(reqNode.request);
+                    appNode.granted += this.asData(reqNode.granted);
+                    appNode.grantedDefinedCount += this.asCount(reqNode.granted);
                     appNode.grantedTotalCount += 1;
                 });
             }
@@ -333,5 +373,15 @@ export default class MultiApplicationTree extends LightningElement {
         this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
+    }
+
+    asData(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? param : 0;
+    }
+
+    asCount(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? 1 : 0;
     }
 }

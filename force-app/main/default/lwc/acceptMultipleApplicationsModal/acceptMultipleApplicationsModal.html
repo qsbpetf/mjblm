@@ -1,0 +1,43 @@
+<template>
+    <lightning-modal-header label="Godkänn Ansökningar"></lightning-modal-header>
+    <lightning-modal-body>
+        <lightning-spinner if:true={isLoading} size="medium"></lightning-spinner>
+        <label for="approver1" class="slds-form-element__label slds-no-flex">
+            "Godkänt av 1"
+        </label>
+        <select id="approver1" disabled={disabledSelect} data-approver="1" class="slds-select" onchange={selectApprover}>
+            <option value="">---</option>
+            <option for:each={approvers} for:item="approver" value={approver.Id} key={approver.Id}>{approver.Name}</option>
+        </select>
+        <label for="approver2" class="slds-form-element__label slds-no-flex">
+            "Godkänt av 2"
+        </label>
+        <select id="approver2" disabled={disabledSelect} data-approver="2" class="slds-select" onchange={selectApprover}>
+            <option value="">---</option>
+            <option for:each={approvers} for:item="approver" value={approver.Id} key={approver.Id}>{approver.Name}</option>
+        </select>
+        <span class="xc-error" if:true={errorMsg.length}>{errorMsg}</span>
+        <lightning-input class="slds-form-element__label slds-no-flex" type="checkbox" disabled={disabledCheckbox} label="Ja, jag vill godkänna alla markerade ansökningar med angivna belopp" value={isValidated} onchange={handleCheckbox}> </lightning-input>
+        <br/>
+        <template if:true={isValidated}>
+            <p>
+                <lightning-formatted-rich-text value={infoText}></lightning-formatted-rich-text>
+            </p>
+        </template>
+    </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button
+                variant="brand"
+                class="slds-button slds-button__brand"
+                onclick={onSave}
+                label="Godkänn"
+                title="Godkänn"
+                disabled={disabledButton}></lightning-button>
+        <lightning-button
+                variant="neutral"
+                class="slds-button slds-button__neutral"
+                onclick={onCancel}
+                label="Avbryt"
+                title="Avbryt"></lightning-button>
+    </lightning-modal-footer>
+</template>

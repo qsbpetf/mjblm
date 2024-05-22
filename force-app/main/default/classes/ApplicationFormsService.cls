@@ -100,6 +100,11 @@ public inherited sharing class ApplicationFormsService {
         update form;
     }
 
+    public static void updateApplicationsBulk(List<Application__c> forms) {
+        update forms;
+        System.debug('*** Updated applications:' + forms);
+    }
+
     public static Id createTemporary() {
         Application__c app = new Application__c(
                 XC_Status__c = STATUS_TEMPORARY,
@@ -144,7 +149,7 @@ public inherited sharing class ApplicationFormsService {
     }
 
     public static List<Contact> getApplicationContacts(String applicationId) {
-        Id lfID = [SELECT XC_LF__c FROM Application__c WHERE Id = :applicationId].XC_LF__c;
+        Id lfID = [SELECT XC_LF__c FROM Application__c WHERE Id = :applicationId].XC_LF__c; 
         List<npe5__Affiliation__c> affiliations = [
                 SELECT
                         npe5__Contact__r.Name,
@@ -153,6 +158,26 @@ public inherited sharing class ApplicationFormsService {
                         npe5__Affiliation__c
                 WHERE
                         npe5__Organization__c = :lfID
+                AND
+                        npe5__Status__c = :MEMBER_STATUS_CURRENT];
+        Set<Contact> contacts = new Set<Contact>();
+        for (npe5__Affiliation__c aff : affiliations) {
+            contacts.add(aff.npe5__Contact__r);
+        }
+        return new List<Contact> (contacts);
+    }
+
+    //** Get current users Approvers*/
+    public static List<Contact> getApproversForCurrentUser() {
+        User currentUser = [SELECT Contact.AccountId, Contact.Account.Name FROM User WHERE Id = :UserInfo.getUserId()];
+        List<npe5__Affiliation__c> affiliations = [
+                SELECT
+                        npe5__Contact__r.Name,
+                        npe5__Contact__r.Id
+                FROM
+                        npe5__Affiliation__c
+                WHERE
+                        npe5__Organization__c = :currentUser.Contact.AccountId
                 AND
                         npe5__Status__c = :MEMBER_STATUS_CURRENT];
         Set<Contact> contacts = new Set<Contact>();
