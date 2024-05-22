@@ -83,6 +83,36 @@ export default class Application extends LightningElement {
         return options.concat(next);
     }
 
+    get optionGroups() {
+        return [
+            {
+                label: "Lek, vila och fritid",
+                options: [
+                    { value: "Jul och andra högtider", text: "Jul och andra högtider" },
+                    { value: "Läger och koloni", text: "Läger och koloni" },
+                    { value: "Semester med familjen", text: "Semester med familjen" },
+                    { value: "Terminsavgift", text: "Terminsavgift" },
+                    { value: "Utsrustning", text: "Utsrustning" }
+                ]
+            },
+            {
+                label: "Utbildning",
+                options: [
+                    { value: "Skolaktiviteter", text: "Skolaktiviteter" },
+                    { value: "Annan utbildning (beskriv)", text: "Annan utbildning (beskriv)" }
+                ]
+            },
+            {
+                label: "Hälsa",
+                options: [
+                    { value: "Glasögon", text: "Glasögon" },
+                    { value: "Medicin", text: "Medicin" },
+                    { value: "Behandling", text: "Behandling" },
+                ]
+            }
+        ];
+    }
+
     addRow() {
         const id = this.rowList.length + 1;
         this.rowList.push({ id: id, firstName: '', lastName: '', year: '', ssn: '' });

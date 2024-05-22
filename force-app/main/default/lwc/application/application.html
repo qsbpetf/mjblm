@@ -220,22 +220,13 @@
                                                     <div class="slds-form-element__control">
                                                         <select id="country-select" class="slds-select" onchange={handleSecondInputChange} name="category" data-id={row.id} value={row.category}>
                                                             <option value="">-- Välj kategori --</option>
-                                                            <optgroup label="Lek, vila och fritid">
-                                                                <option value="Jul och andra högtider">Jul och andra högtider</option>
-                                                                <option value="Läger och koloni">Läger och koloni</option>
-                                                                <option value="Semester med familjen">Semester med familjen</option>
-                                                                <option value="Terminsavgift">Terminsavgift</option>
-                                                                <option value="Utsrustning">Utsrustning</option>
-                                                            </optgroup>
-                                                            <optgroup label="Utbildning">
-                                                                <option value="Skolaktiviteter">Skolaktiviteter</option>
-                                                                <option value="Annan utbildning (beskriv)">Annan utbildning (beskriv)</option>
-                                                            </optgroup>
-                                                            <optgroup label="Hälsa">
-                                                                <option value="Glasögon">Glasögon</option>
-                                                                <option value="Medicin">Medicin</option>
-                                                                <option value="Behandling">Behandling</option>
-                                                            </optgroup>
+                                                            <template for:each={optionGroups} for:item="group">
+                                                                <optgroup label={group.label} key={group.label}>
+                                                                    <template for:each={group.options} for:item="option">
+                                                                        <option value={option.value} key={option.value}>{option.text}</option>
+                                                                    </template>
+                                                                </optgroup>
+                                                            </template>
                                                         </select>
                                                     </div>
                                                 </div>
