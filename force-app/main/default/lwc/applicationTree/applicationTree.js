@@ -103,6 +103,15 @@ export default class ApplicationTree extends LightningElement {
                 variant: 'base'
             },
             initialWidth: 120
+        },
+        {
+            type: 'icon',
+            label: 'Färdigbeh.',
+            cellAttributes: {
+                alternativeText: { fieldName: 'statusIcon' },
+                iconName: { fieldName: 'statusIcon' },
+                size: 'x-small'
+            },
         }
     ];
 
@@ -270,6 +279,8 @@ export default class ApplicationTree extends LightningElement {
                 birthYear: child.XC_Fodelsear__c,
                 request: 0,
                 granted: 0,
+                grantedTotalCount: 0,
+                grantedDefinedCount: 0,
                 action: 'Nytt Bidrag',
                 icon: 'utility:add',
                 _children: []
@@ -297,12 +308,20 @@ export default class ApplicationTree extends LightningElement {
                 icon: 'utility:edit',
             };
             this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
-            this.barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
-            this.barn[child.Barnet_ApplicationEntry__c].granted += childNode.granted || 0;
-            this._totalRequested += childNode.request || 0;
-            this._totalGranted += childNode.granted || 0;
+            this.barn[child.Barnet_ApplicationEntry__c].request += this.asData(childNode.request);
+            this.barn[child.Barnet_ApplicationEntry__c].granted += this.asData(childNode.granted);
+            this.barn[child.Barnet_ApplicationEntry__c].grantedDefinedCount += this.asCount(childNode.granted)
+            this.barn[child.Barnet_ApplicationEntry__c].grantedTotalCount += 1;
+            this._totalRequested += this.asData(childNode.request);
+            this._totalGranted += this.asData(childNode.granted);
             this.dataById[child.Id] = childNode;
             this.recordById[child.Id] = child;
+        });
+        
+        Object.entries(this.barn).forEach(([key, child]) => {
+            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount);
+            child.statusIcon = (child.grantedTotalCount === child.grantedDefinedCount && this.validateApplication(child._children)) ? 'action:approval' : 'action:new_note';
+            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount, ' Status icon=', child.statusIcon);
         });
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
@@ -310,5 +329,29 @@ export default class ApplicationTree extends LightningElement {
         this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
+    }
+
+    asData(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? param : 0;
+    }
+
+    asCount(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? 1 : 0;
+    }
+
+    asText(param) {
+        let digitRegExp = /^"[^"]+"$/;
+        return (digitRegExp.test(param)) ? param : null;
+    }
+
+    //validates if all rows have category, subcategory and paymentType
+    validateApplication(rows){
+        let validatedRow = 0;
+        rows.forEach(row => {
+            if (this.asText(JSON.stringify(row.category)) && this.asText(JSON.stringify(row.paymentType)) && this.asText(JSON.stringify(row.subCategory))) validatedRow += 1;
+        });
+        return rows.length === validatedRow;
     }
 }
