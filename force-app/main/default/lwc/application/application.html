@@ -124,41 +124,206 @@
                 <lightning-layout-item size="12">
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
-                        <div class="slds-p-around_small">Barnet/barnen som ansökan gäller:</div>
+
+
+
+                        <lightning-layout multiple-rows="true" horizontal-align="spread">
+                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
+
+                                <table class="slds-table slds-var-m-bottom_small">
+                                    <thead>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class=""><h3>Barnet/barnen som ansökan gäller:</h3></div>
+                                        </td>
+                                    </tr>
+                                    </thead>
+                                    <template for:each={rowList} for:item="row" for:index="index">
+                                        <tr class="inputRows" key={row.id}>
+                                            <td class="small-cell">
+                                                <lightning-input label="Förnamn" type="text" name="firstName" data-id={row.id} value={row.firstName}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input label="Efternamn" type="text" name="lastName" data-id={row.id} value={row.lastName}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input label="Födelseår" type="text" name="year" data-id={row.id} value={row.year}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input label="Personnummer/Samordningsnummer/LMA-nummer" type="text" name="ssn" data-id={row.id} value={row.ssn}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell-icon">
+                                                <lightning-button-icon name={row.id} icon-name="utility:delete" title="Delete"
+                                                                       variant="bare" onclick={deleteRow}></lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </table>
+
+                                <lightning-button
+                                        variant="neutral" label="Fler Barn" title="Fler Barn"
+                                        onclick={addRow} class="slds-button slds-button__neutral slds-var-m-bottom_x-small slds-var-m-left_x-small">
+                                </lightning-button>
+
+                            </lightning-layout-item>
+                            <lightning-layout-item size="2" class="slds-p-around_small">
+                                <div class="slds-grid slds-grid_pull-padded">
+                                    <div class="slds-col slds-text-align_right slds-align-middle child-count-prefix">
+                                        Totalt antal barn som<br/>ansökan gäller:
+                                    </div>
+                                    <div class="slds-col slds-align-middle child-count">
+                                        <h1>{rowList.length}</h1>
+                                    </div>
+                                </div>
+                            </lightning-layout-item>
+
+                            <lightning-layout-item size="4" medium-device-size="3">
+                                <lightning-input
+                                        read-only={isCertify}
+                                        data-field="XC_SiblingsAge__c"
+                                        value={form.XC_SiblingsAge__c}
+                                        type="text"
+                                        label="Ålder på övriga syskon som bor hemma"
+                                        onchange={inputChange}
+                                        class="slds-var-m-left_medium">
+                                </lightning-input>
+                            </lightning-layout-item>
+                        </lightning-layout>
+
+                        <lightning-layout multiple-rows="true" horizontal-align="spread">
+
+                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
+                                <table class="slds-table slds-var-m-bottom_small">
+                                    <thead>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class=""><h3>Vad söker du stöd för?</h3></div>
+                                        </td>
+                                        <td colspan="1">
+                                            <div class=""><h3>För vilka barn?</h3></div>
+                                        </td>
+                                        <td colspan="1">
+                                            <div class=""><h3>För vilket belopp?</h3></div>
+                                        </td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <template for:each={secondRowList} for:item="row" for:index="index2">
+                                        <tr class="inputRows" key={row.id}>
+                                            <td class="small-cell">
+                                                <div class="slds-form-element">
+                                                    <label for="country-select" class="slds-form-element__label">Välj i rullistan ex. cykel</label>
+                                                    <div class="slds-form-element__control">
+                                                        <select id="country-select" class="slds-select" onchange={handleSecondInputChange} name="category" data-id={row.id} value={row.category}>
+                                                            <option value="">-- Välj kategori --</option>
+                                                            <optgroup label="Lek, vila och fritid">
+                                                                <option value="Jul och andra högtider">Jul och andra högtider</option>
+                                                                <option value="Läger och koloni">Läger och koloni</option>
+                                                                <option value="Semester med familjen">Semester med familjen</option>
+                                                                <option value="Terminsavgift">Terminsavgift</option>
+                                                                <option value="Utsrustning">Utsrustning</option>
+                                                            </optgroup>
+                                                            <optgroup label="Utbildning">
+                                                                <option value="Skolaktiviteter">Skolaktiviteter</option>
+                                                                <option value="Annan utbildning (beskriv)">Annan utbildning (beskriv)</option>
+                                                            </optgroup>
+                                                            <optgroup label="Hälsa">
+                                                                <option value="Glasögon">Glasögon</option>
+                                                                <option value="Medicin">Medicin</option>
+                                                                <option value="Behandling">Behandling</option>
+                                                            </optgroup>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <!--                                                <lightning-combobox label="Välj i rullistan ex. cykel" name="category" data-id={row.id} value={row.category}-->
+<!--                                                                    options={categoryOptions} onchange={handleSecondInputChange}></lightning-combobox>-->
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input label="Vid annat, beskriv" type="text" name="description" data-id={row.id} value={row.description}
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-select label="Välj barn som stödet gäller" name="child" data-id={row.id} value={row.child}
+                                                                    options={childOptions} onchange={handleSecondInputChange}></lightning-select>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input label="Skriv totalt belopp ex. 3000" type="number" name="amount" data-id={row.id} value={row.amount}
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                            </td>
+                                            <td class="small-cell-icon">
+                                                <lightning-button-icon name={row.id} icon-name="utility:delete" title="Delete"
+                                                                       variant="bare" onclick={deleteSecondRow}></lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr>
+                                        <td class="small-cell" colspan="2">
+                                            <lightning-button
+                                                    variant="neutral" label="Fler Rader" title="Fler Rader"
+                                                    onclick={addSecondRow} class="slds-button slds-button__neutral">
+                                            </lightning-button>
+                                        </td>
+                                        <td class="small-cell-icon">
+                                            <div class="slds-col slds-text-align_right child-count-prefix">
+                                                Totalt<br/>belopp:
+                                            </div>
+                                        </td>
+                                        <td class="small-cell-icon">
+                                            <div class="my-readonly">{sumSecondRows}</div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </lightning-layout-item>
+
+
+                        </lightning-layout>
+
+
+
+
+
+                    </div>
+                    <div style="border-bottom: 2px solid black;" class="main-card">
+
                         <lightning-layout multiple-rows="true" horizontal-align="spread">
                             <lightning-layout-item size="12" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
                                 <!---->
                                 <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-bottom_small">
                                     <thead>
-                                    <tr class="slds-text-title_caps">
-                                        <template for:each={columns} for:item="column" if:true={column.show}>
-                                            <th key={column.name}>
-                                                <div class="slds-truncate">{column.label}</div>
-                                            </th>
-                                        </template>
-                                    </tr>
+                                        <tr class="slds-text-title_caps">
+                                            <template for:each={columns} for:item="column" if:true={column.show}>
+                                                <th key={column.name}>
+                                                    <div class="slds-truncate">{column.label}</div>
+                                                </th>
+                                            </template>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    <template if:true={data.length} for:each={data} for:item="row" for:index="index">
-                                        <tr class="inputRows" key={row.rowIndex}>
-                                            <template for:each={columns} for:item="column" if:true={column.show}>
-                                                <td key={column.name}>
-                                                    <c-table-input readonlyy={isCertify} oninputchange={onInputChange}
-                                                                   row={row} column={column}></c-table-input>
+                                        <template if:true={data.length} for:each={data} for:item="row" for:index="index">
+                                            <tr class="inputRows" key={row.rowIndex}>
+                                                <template for:each={columns} for:item="column" if:true={column.show}>
+                                                    <td key={column.name}>
+                                                        <c-table-input readonlyy={isCertify} oninputchange={onInputChange}
+                                                                       row={row} column={column}></c-table-input>
+                                                    </td>
+                                                </template>
+                                                <td>
+                                                    <lightning-button-icon if:true={isApply} data-row-index={row.rowIndex}
+                                                                           icon-name="utility:delete" value={index}
+                                                                           variant="bare"
+                                                                           onclick={remove}></lightning-button-icon>
                                                 </td>
-                                            </template>
-                                            <td>
-                                                <lightning-button-icon if:true={isApply} data-row-index={row.rowIndex}
-                                                                       icon-name="utility:delete" value={index}
-                                                                       variant="bare"
-                                                                       onclick={remove}></lightning-button-icon>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template if:false={data.length}>
-                                        <div if:true={isApply} class="slds-p-around_large">{labels.AT_LEAST_ONE_ROW}
-                                        </div>
-                                    </template>
+                                            </tr>
+                                        </template>
+                                        <template if:false={data.length}>
+                                            <div if:true={isApply} class="slds-p-around_large">{labels.AT_LEAST_ONE_ROW}
+                                            </div>
+                                        </template>
                                     </tbody>
                                 </table>
                                 <!---->

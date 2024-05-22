@@ -10,7 +10,7 @@
 }
 
 .xc-grey-header h1 {
-    font-size: 2vh;
+    font-size: 1.5em;
     font-weight: bold;
     display: inline-block;
 }
@@ -20,7 +20,7 @@ ol {
 }
 
 lightning-card {
-    font-size: 1.8vh;
+    font-size: 1.4em;
 }
 
 
@@ -29,7 +29,7 @@ lightning-card {
 }
 
 .slds-select {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .show-inline {
@@ -41,9 +41,10 @@ lightning-card {
 }
 
 .totalsumma {
-    font-size: 2.2vh;
+    font-size: 1.6em;
     font-weight: bold;
 }
+
 .main-card {
     padding: 32px;
 }
@@ -52,4 +53,42 @@ lightning-card {
     .main-card {
         padding: 8px;
     }
+}
+
+.child-count {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333333;
+    background-color: rgb(243, 243, 243);
+    padding: 5px 25px;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+}
+
+.child-count-prefix {
+    font-size: 0.7em;
+    font-weight: bold;
+    line-height: 1.1;
+    color: #333333;
+    margin-left: 30px;
+    margin-right: 5px;
+}
+
+.small-cell {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.small-cell-icon {
+    padding-top: 1em;
+    padding-bottom: 0;
+}
+
+.my-readonly {
+    font-size: 1em;
+    font-weight: 400;
+    background-color: rgb(243, 243, 243);
+    padding: 3px 12px;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
 }

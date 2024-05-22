@@ -70,6 +70,83 @@ export default class Application extends LightningElement {
 
     error;
 
+    @track rowList = [];
+    @track secondRowList = [];
+    @track sumSecondRows = 0;
+
+    // Getter for child select options
+    get childOptions() {
+        let options = [{ label: '-- Välj barn --', value: '' }];
+        let next = this.rowList.map(child => {
+            return { label: child.firstName + ' ' + child.lastName, value: child.id };
+        });
+        return options.concat(next);
+    }
+
+    addRow() {
+        const id = this.rowList.length + 1;
+        this.rowList.push({ id: id, firstName: '', lastName: '', year: '', ssn: '' });
+        console.log('Added row with id: ' + id, this.rowList);
+    }
+
+    deleteRow(event) {
+        const rowToDelete = parseInt(event.target.name, 10);
+        this.rowList = this.rowList.filter(row => row.id !== rowToDelete);
+    }
+
+    handleInputChange(event) {
+        const rowIndex = parseInt(event.target.dataset.id, 10);
+        const fieldName = event.target.name;
+        const value = event.target.value;
+
+        let row = this.rowList.find(row => row.id === rowIndex);
+        if (row) {
+            row[fieldName] = value;
+        }
+    }
+
+    addSecondRow() {
+        const id = this.secondRowList.length + 1;
+        this.secondRowList.push({ id: id, category: '', description: '', child: '', amount: null });
+        console.log('Added row with id: ' + id, this.secondRowList);
+    }
+
+    deleteSecondRow(event) {
+        const rowToDelete = parseInt(event.target.name, 10);
+        this.secondRowList = this.secondRowList.filter(row => row.id !== rowToDelete);
+    }
+
+    handleSecondInputChange(event) {
+        const rowIndex = parseInt(event.target.dataset.id, 10);
+        const fieldName = event.target.name;
+        const value = event.target.value;
+
+        let row = this.secondRowList.find(row => row.id === rowIndex);
+        if (row) {
+            if (fieldName === 'amount') {
+                row[fieldName] = parseInt(value, 10);
+                this.calculateTotalAmount();
+            } else {
+                row[fieldName] = value;
+            }
+        }
+    }
+
+    calculateTotalAmount() {
+        let totalAmount = 0;
+        this.secondRowList.forEach(row => {
+            totalAmount += this.asData(row.amount);
+        });
+        this.form.XC_Totalsumma_kr__c = totalAmount;
+        // const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.sumSecondRows = totalAmount.toLocaleString('sv-SE');
+    }
+
+    asData(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? param : 0;
+    }
+
     get isApply() {
         return this.ctx === 'apply';
     }
@@ -180,6 +257,8 @@ export default class Application extends LightningElement {
     }
 
     async connectedCallback() {
+        this.addRow();
+        this.addSecondRow();
         this.formId = this.getUrlParamValue(window.location.href, 'formid');
         if (this.isCertify) {
             this.valid = await apexCheckLinkValidity({formId: this.formId});
