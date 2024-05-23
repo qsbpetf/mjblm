@@ -21,6 +21,16 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
+    public static String createApplication(Application__c application, List<Map<String, Object>> children, List<Map<String, Object>> requests) {
+        try {
+            String res = ApplicationFormsService.createApplication(application, children, requests);
+            return res;
+        } catch (Exception ex) {
+            throw new AuraHandledException(ex.getMessage());
+        }
+    }
+
+    @AuraEnabled
     public static void updateApplication(Application__c form) {
         try {
             Application__c form1 = form;

@@ -1,5 +1,6 @@
 import { LightningElement, track, api } from 'lwc';
-import apexApply from '@salesforce/apex/ApplicationFormsController.apply';
+// import apexApply from '@salesforce/apex/ApplicationFormsController.apply';
+import apexCreateApplication from '@salesforce/apex/ApplicationFormsController.createApplication';
 import apexCreateTemporary from '@salesforce/apex/ApplicationFormsController.createTemporary';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
 import apexUpdateApplication from '@salesforce/apex/ApplicationFormsController.updateApplication';
@@ -75,6 +76,7 @@ export default class Application extends LightningElement {
     @track secondRowList = [];
     @track sumSecondRows = 0;
     @track optionGroups = [];
+    picklistLookup = {};
 
     // Getter for child select options
     get childOptions() {
@@ -109,7 +111,16 @@ export default class Application extends LightningElement {
 
     addSecondRow() {
         const id = this.secondRowList.length + 1;
-        this.secondRowList.push({ id: id, category: '', description: '', child: '', amount: null });
+        this.secondRowList.push({
+            id: id,
+            category: '',
+            subcategory: '',
+            description: '',
+            child: '',
+            amount: null,
+            descriptionDisabled: true,
+            descriptioRequired: false
+        });
         console.log('Added row with id: ' + id, this.secondRowList);
     }
 
@@ -129,7 +140,22 @@ export default class Application extends LightningElement {
                 row[fieldName] = parseInt(value, 10);
                 this.calculateTotalAmount();
             } else {
-                row[fieldName] = value;
+                if (fieldName === 'category') {
+                    row.subcategory = value;
+                    row.category = this.getPicklistLookup(value);
+                    if (row.subcategory.includes('(beskriv)')) {
+                        row.description = '';
+                        row.descriptionDisabled = false;
+                        row.descriptioRequired = true;
+                    }
+                    else {
+                        row.descriptioRequired = false;
+                        row.descriptionDisabled = true;
+                        row.description = '';
+                    }
+                } else {
+                    row[fieldName] = value;
+                }
             }
         }
     }
@@ -142,6 +168,7 @@ export default class Application extends LightningElement {
         this.form.XC_Totalsumma_kr__c = totalAmount;
         // const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.sumSecondRows = totalAmount.toLocaleString('sv-SE');
+        this.form.XC_RequestedAmount__c = totalAmount;
     }
 
     asData(param) {
@@ -261,9 +288,23 @@ export default class Application extends LightningElement {
     async getPicklistHierarchy() {
         try {
             this.optionGroups = await apexGetPicklistHierarchy();
+            this.buildPicklistLookup();
         } catch (e) {
             this.error = JSON.stringify(e);
         }
+    }
+
+    buildPicklistLookup() {
+        this.picklistLookup = {};
+        this.optionGroups.forEach(group => {
+            group.options.forEach(option => {
+                this.picklistLookup[option.value] = group.label;
+            });
+        });
+    }
+
+    getPicklistLookup(value) {
+        return this.picklistLookup[value];
     }
 
     async connectedCallback() {
@@ -395,7 +436,11 @@ export default class Application extends LightningElement {
                     this.form.XC_LinkValidDate__c = this.selectedLF.XC_CurrentApplicationDate__c;
                     delete this.form.uppgifterna;
                     delete this.form.integritetspolicy;
-                    this.createdId = await apexApply({application: this.form, children: this.data});
+                    this.createdId = await apexCreateApplication({
+                        application: this.form,
+                        children: this.rowList,
+                        requests: this.secondRowList
+                    });
                 } catch (e) {
                     this.error = JSON.stringify(e);
                     console.log('err ' + this.error);
@@ -478,12 +523,12 @@ export default class Application extends LightningElement {
         let tableValid = true;
         let inputsValid = true;
         this.tableErrors = [];
-        if (this.data.length === 0) {
+        if (this.rowList.length === 0) {
             this.tableErrors.push(labels.AT_LEAST_ONE_ROW);
             tableValid = false;
         } else {
-            const uniqueNumbers = new Set(this.data.map(el => el.XC_Personnummer__c));
-            if (uniqueNumbers.size !== this.data.length) {
+            const uniqueNumbers = new Set(this.rowList.map(el => el.ssn));
+            if (uniqueNumbers.size !== this.rowList.length) {
                 this.tableErrors.push(labels.DUPLICATE_CHILD);
                 this.handleScrollClick('tbody');
                 tableValid = false;
@@ -501,8 +546,8 @@ export default class Application extends LightningElement {
                 return false;
             }
             let agesCorrect = true;
-            this.data.forEach(child => {
-                if (child.XC_Fodelsear__c < new Date().getFullYear() - 19) {
+            this.rowList.forEach(child => {
+                if (child.year < new Date().getFullYear() - 19) {
                     agesCorrect = false;
                 }
             });

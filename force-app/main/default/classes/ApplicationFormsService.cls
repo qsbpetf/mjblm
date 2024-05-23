@@ -96,6 +96,48 @@ public inherited sharing class ApplicationFormsService {
         return application.XC_FormId__c;
     }
 
+    public static String createApplication(Application__c application, List<Map<String, Object>> children, List<Map<String, Object>> requests) {
+        String formId = [SELECT Name FROM Application__c WHERE Id = :application.Id].Name;
+        application.XC_LinkValidDate__c = Date.today().addDays(7);
+        application.XC_Status__c = STATUS_NEW;
+        application.XC_FormId__c = formId;
+        update application;
+
+        Map<Integer, XC_ApplicationEntryChild__c> childrenToInsert = new Map<Integer, XC_ApplicationEntryChild__c>();
+        for (Map<String, Object> child : children) {
+            System.debug('CHILD: ' + JSON.serializePretty(child));
+            XC_ApplicationEntryChild__c childToInsert = new XC_ApplicationEntryChild__c();
+            childToInsert.XC_Application__c = application.Id;
+            childToInsert.XC_Fornamn__c = (String) child.get('firstName');
+            childToInsert.XC_Efternamn__c = (String) child.get('lastName');
+            childToInsert.XC_Fodelsear__c = (String) child.get('year');
+            childToInsert.XC_Personnummer__c = (String) child.get('ssn');
+            childrenToInsert.put(Integer.valueOf(child.get('id')), childToInsert);
+        }
+        insert childrenToInsert.values();
+
+        List<Bidragsrader__c> requestsToInsert = new List<Bidragsrader__c>();
+        for (Map<String, Object> request : requests) {
+            System.debug('REQUEST: ' + JSON.serializePretty(request));
+            Bidragsrader__c requestToInsert = new Bidragsrader__c();
+            requestToInsert.Application__c = application.Id;
+            requestToInsert.Kategori__c = (String) request.get('category');
+            requestToInsert.Underkategori__c = (String) request.get('subcategory');
+            requestToInsert.Ans_kt_V_rde_Kontanter_Presentkort__c = (Decimal) request.get('amount');
+            requestToInsert.Annat_Beskrivning__c = (String) request.get('description');
+            if (request.get('child') != null) {
+                Object val = request.get('child');
+                System.debug('CHILD: ' + request.get('child'));
+                XC_ApplicationEntryChild__c child = childrenToInsert.get(Integer.valueOf(request.get('child')));
+                requestToInsert.Barnet_ApplicationEntry__c = child?.Id;
+            }
+            System.debug('OBJ=' + requestToInsert);
+            requestsToInsert.add(requestToInsert);
+        }
+        insert requestsToInsert;
+        return application.XC_FormId__c;
+    }
+
     public static void updateApplication(Application__c form) {
         update form;
     }
@@ -116,7 +158,7 @@ public inherited sharing class ApplicationFormsService {
     }
 
     public static List<XC_Kommun__c> getKommuns() {
-        return [SELECT Name, XC_Lan__c FROM XC_Kommun__c];
+        return [SELECT Name, XC_Lan__c FROM XC_Kommun__c ORDER BY Name];
     }
 
     public static List<Account> getLfs(String kommun) {

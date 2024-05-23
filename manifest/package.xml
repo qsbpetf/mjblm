@@ -40,5 +40,60 @@
         <members>New_Child_Request</members>
         <name>FlowDefinition</name>
     </types>
+    <types>
+        <members>Accepted_notes_reasons</members>
+        <members>Applicant_Confirmation_Screen</members>
+        <members>ApplicationFormURL</members>
+        <members>Approve</members>
+        <members>Approved_amount</members>
+        <members>Cancel</members>
+        <members>Certifier_Confirmation_Screen</members>
+        <members>Certifier_or_file</members>
+        <members>Confirm</members>
+        <members>Confirm_Email_Fail_Message</members>
+        <members>Create_forms</members>
+        <members>Declared_Files</members>
+        <members>Duplicate_child</members>
+        <members>Emails_not_the_same</members>
+        <members>Info_Text_Attachments</members>
+        <members>Info_text_for_Intygsgivare_e_post</members>
+        <members>Info_text_for_selecting_L_n_Kommun_LF</members>
+        <members>Informational_Text</members>
+        <members>Integritetspolicy</members>
+        <members>Intyg_Epost_Info</members>
+        <members>Make_sure_all_fields_completed</members>
+        <members>No</members>
+        <members>No_email</members>
+        <members>No_recipients_with_address</members>
+        <members>None_of_selected_recipients_email</members>
+        <members>Please_select_at_least_one_approver</members>
+        <members>Please_select_at_least_one_row</members>
+        <members>Please_select_rejecting_person</members>
+        <members>Recipients</members>
+        <members>Reject</members>
+        <members>Rejected_By</members>
+        <members>Rejected_Notes_Reasons</members>
+        <members>Request_correct</members>
+        <members>Save</members>
+        <members>Save_documents_into_files</members>
+        <members>Select_First_Approver</members>
+        <members>Select_Kommun</members>
+        <members>Select_LF</members>
+        <members>Select_Lan</members>
+        <members>Select_Second_Approver</members>
+        <members>Select_recipients</members>
+        <members>Selected_recipients</members>
+        <members>Selected_recipients_to_send_the_form</members>
+        <members>Send_documents_to_the_recipients</members>
+        <members>Send_form</members>
+        <members>Some_recipients_no_email</members>
+        <members>Success</members>
+        <members>Total_summa_not_zero</members>
+        <members>Uppgifterna</members>
+        <members>Year_pattern_Mismatch</members>
+        <members>Year_too_low</members>
+        <members>Yes</members>
+        <name>CustomLabel</name>
+    </types>
     <version>60.0</version>
 </Package>
