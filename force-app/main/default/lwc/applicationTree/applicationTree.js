@@ -5,6 +5,9 @@
 import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
 import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatestApplications';
+import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
+import RejectApplication from 'c/rejectApplication';
+import {ShowToastEvent} from "lightning/platformShowToastEvent";
 
 export default class ApplicationTree extends LightningElement {
 
@@ -202,6 +205,43 @@ export default class ApplicationTree extends LightningElement {
             }
         }
     }
+    //open accept application modal
+    async handleApproveClick(){
+        const result = await AcceptMultipleApplicationsModal.open({
+            size: 'medium',
+            description: 'Approve',
+            recordIds: `${this.recordId}`,
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+    //open reject application modal
+    async handleReject() {
+        const result = await RejectApplication.open({
+            size: 'medium',
+            description: 'Reject',
+            recordId: `${this.recordId}`,
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+
+    showNotification(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+        this.dispatchEvent(evt);
+    }
 
     connectedCallback() {
         this.getApplication(this.recordId);
@@ -318,11 +358,16 @@ export default class ApplicationTree extends LightningElement {
             this.recordById[child.Id] = child;
         });
         
+        let allChildrenValidated = true;
         Object.entries(this.barn).forEach(([key, child]) => {
-            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount);
-            child.statusIcon = (child.grantedTotalCount === child.grantedDefinedCount && this.validateApplication(child._children)) ? 'action:approval' : 'action:new_note';
+            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount)
+            const isValid = (child.grantedTotalCount === child.grantedDefinedCount && this.validateApplication(child._children));
+            child.statusIcon = isValid ? 'action:approval' : 'action:new_note';
+            allChildrenValidated &= isValid;
             //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount, ' Status icon=', child.statusIcon);
         });
+
+        //if false allchildren.. disable button
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.totalRequested = formatter.format(this._totalRequested);
@@ -341,16 +386,20 @@ export default class ApplicationTree extends LightningElement {
         return (digitRegExp.test(param)) ? 1 : 0;
     }
 
-    asText(param) {
-        let digitRegExp = /^"[^"]+"$/;
-        return (digitRegExp.test(param)) ? param : null;
+    hasText(param) {
+        return !(param === undefined || param === null || param.length === 0)
     }
 
     //validates if all rows have category, subcategory and paymentType
     validateApplication(rows){
+        if (rows.length === 0){
+            return false;
+        }
         let validatedRow = 0;
         rows.forEach(row => {
-            if (this.asText(JSON.stringify(row.category)) && this.asText(JSON.stringify(row.paymentType)) && this.asText(JSON.stringify(row.subCategory))) validatedRow += 1;
+            if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
+                validatedRow += 1;
+            }
         });
         return rows.length === validatedRow;
     }
