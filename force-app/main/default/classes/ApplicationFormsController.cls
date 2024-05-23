@@ -191,5 +191,13 @@ public without sharing class ApplicationFormsController {
         }
     }
 
-
+    @AuraEnabled
+    public static List<ApplicationFormsService.PicklistValue> getPicklistHierarchy() {
+        try {
+            List<ApplicationFormsService.PicklistValue> res = ApplicationFormsService.getPicklistHierarchy();
+            return res;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
 }

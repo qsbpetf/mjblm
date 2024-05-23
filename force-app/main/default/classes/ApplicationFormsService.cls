@@ -450,6 +450,94 @@ public inherited sharing class ApplicationFormsService {
         delete new List<ContentDocument> (contentDocuments);
     }
 
+    public static Map<Object,List<String>> getDependentPicklistValues( Schema.sObjectField dependToken )
+    {
+        Schema.DescribeFieldResult depend = dependToken.getDescribe();
+        Schema.SObjectField controlToken = depend.getController();
+        if ( controlToken == null ) return null;
+        Schema.DescribeFieldResult control = controlToken.getDescribe();
+        List<Schema.PicklistEntry> controlEntries =
+            (   control.getType() == Schema.DisplayType.Boolean
+                ?   null
+                :   control.getPicklistValues()
+            );
+
+        String base64map = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+        Map<Object,List<String>> dependentPicklistValues = new Map<Object,List<String>>();
+        for ( Schema.PicklistEntry entry : depend.getPicklistValues() ) {
+            if ( entry.isActive() ) {
+                List<String> base64chars =
+                    String.valueOf
+                        (   ((Map<String,Object>) JSON.deserializeUntyped( JSON.serialize( entry ) )).get( 'validFor' )
+                        ).split( '' );
+                for ( Integer index = 0; index < (controlEntries != null ? controlEntries.size() : 2); index++ ) {
+                    Object controlValue =
+                        (   controlEntries == null
+                            ?   (Object) (index == 1)
+                            :   (Object) (controlEntries[ index ].isActive() ? controlEntries[ index ].getLabel() : null)
+                        );
+                    Integer bitIndex = index / 6, bitShift = 5 - Math.mod( index, 6 );
+                    if (   controlValue == null
+                        ||  (base64map.indexOf( base64chars[ bitIndex ] ) & (1 << bitShift)) == 0
+                    ) {
+                        continue;
+                    }
+                    if ( !dependentPicklistValues.containsKey( controlValue ) )
+                    {
+                        dependentPicklistValues.put( controlValue, new List<String>() );
+                    }
+                    dependentPicklistValues.get( controlValue ).add( entry.getLabel() );
+                }
+            }
+        }
+        return dependentPicklistValues;
+    }
+
+    public static List<PicklistValue> getPicklistHierarchy() {
+        List<PicklistValue> hierarchy = new List<PicklistValue>();
+
+        // Retrieve picklist values for Kategori__c and Underkategori__c fields
+        Schema.DescribeFieldResult categoryField = Schema.SObjectType.Bidragsrader__c.fields.Kategori__c.getSobjectField().getDescribe();
+        Schema.DescribeFieldResult subcategoryField = Schema.SObjectType.Bidragsrader__c.fields.Underkategori__c.getSobjectField().getDescribe();
+
+        Map<Object,List<String>> dependValuesByControlValue = getDependentPicklistValues( Bidragsrader__c.Underkategori__c );
+
+        System.debug(dependValuesByControlValue);
+
+        // Loop through the dependValuesByControlValue and print the result
+        for (Object controlValue : dependValuesByControlValue.keySet()) {
+            PicklistValue grp = new PicklistValue(String.valueOf(controlValue));
+            List<String> dependentValues = dependValuesByControlValue.get(controlValue);
+            List<PicklistValue> subcategories = grp.options;
+            for (String dependentValue : dependentValues) {
+                subcategories.add(new PicklistValue(dependentValue, dependentValue));
+            }
+            hierarchy.add(grp);
+            System.debug('*** Control value: ' + controlValue + ' ***');
+            System.debug('*** Dependent values: ' + dependentValues + ' ***');
+        }
+
+        // Retrieve picklist values for Kategori__c field
+        return hierarchy;
+    }
+
+    public class PicklistValue {
+        @AuraEnabled public String label;
+        @AuraEnabled public String text;
+        @AuraEnabled public String value;
+        @AuraEnabled public List<PicklistValue> options;
+
+        public PicklistValue(String label) {
+            this.label = label;
+            this.options = new List<PicklistValue>();
+        }
+
+        public PicklistValue(String text, String value) {
+            this.text = text;
+            this.value = value;
+        }
+    }
+
     public class PicklistEntryWrapper {
         @AuraEnabled public String value { get; set; }
         @AuraEnabled public String label { get; set; }
