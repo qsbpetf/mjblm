@@ -71,6 +71,8 @@ public inherited sharing class ApplicationFormsService {
                                 Id,
                                 Name,
                                 Barnet_ApplicationEntry__c,
+                                Barnet_ApplicationEntry__r.XC_Fornamn__c,
+                                Barnet_ApplicationEntry__r.XC_Efternamn__c,
                                 Kategori__c,
                                 Underkategori__c,
                                 Beviljat_V_rde_Presentkort_Kontanter__c,

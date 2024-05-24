@@ -99,4 +99,15 @@ lightning-card {
     padding: 2px 12px;
     border: 1px solid #d8dde6;
     border-radius: 4px;
+    min-height: 30px;
+}
+
+.my-readonly-normal {
+    font-size: 0.85em;
+    font-weight: normal;
+    background-color: rgb(243, 243, 243);
+    padding: 2px 12px;
+    border: 1px solid #d8dde6;
+    border-radius: 4px;
+    min-height: 30px;
 }

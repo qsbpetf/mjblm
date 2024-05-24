@@ -270,8 +270,23 @@ export default class Application extends LightningElement {
     async loadForm() {
         try {
             this.form = await apexGetApplication({formId: this.formId});
-            this.data = [...this.form.Barnen__r.map(
-                el => Object.assign(el, {rowIndex: el.Id})
+            this.rowList = [...this.form.Barnen__r.map(
+                el => Object.assign(el, {
+                    rowIndex: el.Id,
+                    firstName: el.XC_Fornamn__c,
+                    lastName: el.XC_Efternamn__c,
+                    year: el.XC_Fodelsear__c,
+                    ssn: el.XC_Personnummer__c
+                })
+            )];
+            this.secondRowList = [...this.form.Bidragsrader__r.map(
+                el => Object.assign(el, {
+                    id: el.Id,
+                    category: el.Underkategori__c,
+                    description: el.Annat_Beskrivning__c,
+                    child: el.Barnet_ApplicationEntry__r.XC_Fornamn__c + ' ' + el.Barnet_ApplicationEntry__r.XC_Efternamn__c,
+                    amount: el.Ans_kt_V_rde_Kontanter_Presentkort__c
+                })
             )];
             this.form.XC_ApprovedByCertifier__c = true;
             this.formLoaded = true;
