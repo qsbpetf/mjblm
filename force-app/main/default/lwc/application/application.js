@@ -1,5 +1,6 @@
 import { LightningElement, track, api } from 'lwc';
-import apexApply from '@salesforce/apex/ApplicationFormsController.apply';
+// import apexApply from '@salesforce/apex/ApplicationFormsController.apply';
+import apexCreateApplication from '@salesforce/apex/ApplicationFormsController.createApplication';
 import apexCreateTemporary from '@salesforce/apex/ApplicationFormsController.createTemporary';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
 import apexUpdateApplication from '@salesforce/apex/ApplicationFormsController.updateApplication';
@@ -10,6 +11,7 @@ import apexCheckLinkValidity from '@salesforce/apex/ApplicationFormsController.c
 import apexGetPreselectedLf from '@salesforce/apex/ApplicationFormsController.getPreselectedLf';
 import apexInitEmptyApp from '@salesforce/apex/ApplicationFormsController.initEmptyApp';
 import apexRemoveOldFiles from '@salesforce/apex/ApplicationFormsController.removeOldFiles';
+import apexGetPicklistHierarchy from '@salesforce/apex/ApplicationFormsController.getPicklistHierarchy';
 import labels from './labels';
 
 export default class Application extends LightningElement {
@@ -69,6 +71,109 @@ export default class Application extends LightningElement {
     lfPreselected = false;
 
     error;
+
+    @track rowList = [];
+    @track secondRowList = [];
+    @track sumSecondRows = 0;
+    @track optionGroups = [];
+    picklistLookup = {};
+
+    // Getter for child select options
+    get childOptions() {
+        let options = [{ label: '-- Välj barn --', value: '' }];
+        let next = this.rowList.map(child => {
+            return { label: child.firstName + ' ' + child.lastName, value: child.id };
+        });
+        return options.concat(next);
+    }
+
+    addRow() {
+        const id = this.rowList.length + 1;
+        this.rowList.push({ id: id, firstName: '', lastName: '', year: '', ssn: '' });
+        console.log('Added row with id: ' + id, this.rowList);
+    }
+
+    deleteRow(event) {
+        const rowToDelete = parseInt(event.target.name, 10);
+        this.rowList = this.rowList.filter(row => row.id !== rowToDelete);
+    }
+
+    handleInputChange(event) {
+        const rowIndex = parseInt(event.target.dataset.id, 10);
+        const fieldName = event.target.name;
+        const value = event.target.value;
+
+        let row = this.rowList.find(row => row.id === rowIndex);
+        if (row) {
+            row[fieldName] = value;
+        }
+    }
+
+    addSecondRow() {
+        const id = this.secondRowList.length + 1;
+        this.secondRowList.push({
+            id: id,
+            category: '',
+            subcategory: '',
+            description: '',
+            child: '',
+            amount: null,
+            descriptionDisabled: true,
+            descriptioRequired: false
+        });
+        console.log('Added row with id: ' + id, this.secondRowList);
+    }
+
+    deleteSecondRow(event) {
+        const rowToDelete = parseInt(event.target.name, 10);
+        this.secondRowList = this.secondRowList.filter(row => row.id !== rowToDelete);
+    }
+
+    handleSecondInputChange(event) {
+        const rowIndex = parseInt(event.target.dataset.id, 10);
+        const fieldName = event.target.name;
+        const value = event.target.value;
+
+        let row = this.secondRowList.find(row => row.id === rowIndex);
+        if (row) {
+            if (fieldName === 'amount') {
+                row[fieldName] = parseInt(value, 10);
+                this.calculateTotalAmount();
+            } else {
+                if (fieldName === 'category') {
+                    row.subcategory = value;
+                    row.category = this.getPicklistLookup(value);
+                    if (row.subcategory.includes('(beskriv)')) {
+                        row.description = '';
+                        row.descriptionDisabled = false;
+                        row.descriptioRequired = true;
+                    }
+                    else {
+                        row.descriptioRequired = false;
+                        row.descriptionDisabled = true;
+                        row.description = '';
+                    }
+                } else {
+                    row[fieldName] = value;
+                }
+            }
+        }
+    }
+
+    calculateTotalAmount() {
+        let totalAmount = 0;
+        this.secondRowList.forEach(row => {
+            totalAmount += this.asData(row.amount);
+        });
+        // const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.sumSecondRows = totalAmount.toLocaleString('sv-SE');
+        this.form.XC_RequestedAmount__c = totalAmount;
+    }
+
+    asData(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? param : 0;
+    }
 
     get isApply() {
         return this.ctx === 'apply';
@@ -164,8 +269,23 @@ export default class Application extends LightningElement {
     async loadForm() {
         try {
             this.form = await apexGetApplication({formId: this.formId});
-            this.data = [...this.form.Barnen__r.map(
-                el => Object.assign(el, {rowIndex: el.Id})
+            this.rowList = [...this.form.Barnen__r.map(
+                el => Object.assign(el, {
+                    rowIndex: el.Id,
+                    firstName: el.XC_Fornamn__c,
+                    lastName: el.XC_Efternamn__c,
+                    year: el.XC_Fodelsear__c,
+                    ssn: el.XC_Personnummer__c
+                })
+            )];
+            this.secondRowList = [...this.form.Bidragsrader__r.map(
+                el => Object.assign(el, {
+                    id: el.Id,
+                    category: el.Underkategori__c,
+                    description: el.Annat_Beskrivning__c,
+                    child: el.Barnet_ApplicationEntry__r.XC_Fornamn__c + ' ' + el.Barnet_ApplicationEntry__r.XC_Efternamn__c,
+                    amount: el.Ans_kt_V_rde_Kontanter_Presentkort__c
+                })
             )];
             this.form.XC_ApprovedByCertifier__c = true;
             this.formLoaded = true;
@@ -179,8 +299,33 @@ export default class Application extends LightningElement {
         return params.get(key);
     }
 
+    async getPicklistHierarchy() {
+        try {
+            this.optionGroups = await apexGetPicklistHierarchy();
+            this.buildPicklistLookup();
+        } catch (e) {
+            this.error = JSON.stringify(e);
+        }
+    }
+
+    buildPicklistLookup() {
+        this.picklistLookup = {};
+        this.optionGroups.forEach(group => {
+            group.options.forEach(option => {
+                this.picklistLookup[option.value] = group.label;
+            });
+        });
+    }
+
+    getPicklistLookup(value) {
+        return this.picklistLookup[value];
+    }
+
     async connectedCallback() {
+        this.addRow();
+        this.addSecondRow();
         this.formId = this.getUrlParamValue(window.location.href, 'formid');
+        await this.getPicklistHierarchy();
         if (this.isCertify) {
             this.valid = await apexCheckLinkValidity({formId: this.formId});
             await this.getRejectionReasons();
@@ -305,7 +450,11 @@ export default class Application extends LightningElement {
                     this.form.XC_LinkValidDate__c = this.selectedLF.XC_CurrentApplicationDate__c;
                     delete this.form.uppgifterna;
                     delete this.form.integritetspolicy;
-                    this.createdId = await apexApply({application: this.form, children: this.data});
+                    this.createdId = await apexCreateApplication({
+                        application: this.form,
+                        children: this.rowList,
+                        requests: this.secondRowList
+                    });
                 } catch (e) {
                     this.error = JSON.stringify(e);
                     console.log('err ' + this.error);
@@ -388,12 +537,12 @@ export default class Application extends LightningElement {
         let tableValid = true;
         let inputsValid = true;
         this.tableErrors = [];
-        if (this.data.length === 0) {
+        if (this.rowList.length === 0) {
             this.tableErrors.push(labels.AT_LEAST_ONE_ROW);
             tableValid = false;
         } else {
-            const uniqueNumbers = new Set(this.data.map(el => el.XC_Personnummer__c));
-            if (uniqueNumbers.size !== this.data.length) {
+            const uniqueNumbers = new Set(this.rowList.map(el => el.ssn));
+            if (uniqueNumbers.size !== this.rowList.length) {
                 this.tableErrors.push(labels.DUPLICATE_CHILD);
                 this.handleScrollClick('tbody');
                 tableValid = false;
@@ -411,8 +560,8 @@ export default class Application extends LightningElement {
                 return false;
             }
             let agesCorrect = true;
-            this.data.forEach(child => {
-                if (child.XC_Fodelsear__c < new Date().getFullYear() - 19) {
+            this.rowList.forEach(child => {
+                if (child.year < new Date().getFullYear() - 19) {
                     agesCorrect = false;
                 }
             });

@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Accepted_notes_reasons</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Accepted notes/reasons</shortDescription>
+        <value>Kommentar/anledning till godkännande</value>
+    </labels>
+    <labels>
+        <fullName>Applicant_Confirmation_Screen</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Applicant Confirmation Screen</shortDescription>
+        <value>Tack för din ansökan (nr {FormId})</value>
+    </labels>
+    <labels>
+        <fullName>ApplicationFormURL</fullName>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>ApplicationFormURL</shortDescription>
+        <value>https://majblommansriksfrbund.my.site.com/application/s/application/</value>
+    </labels>
+    <labels>
+        <fullName>Approve</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Approve</shortDescription>
+        <value>Godkänn</value>
+    </labels>
+    <labels>
+        <fullName>Approved_amount</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Approved amount</shortDescription>
+        <value>Beviljat belopp</value>
+    </labels>
+    <labels>
+        <fullName>Cancel</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Cancel</shortDescription>
+        <value>Avbryt</value>
+    </labels>
+    <labels>
+        <fullName>Certifier_Confirmation_Screen</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Certifier Confirmation Screen</shortDescription>
+        <value>Tack för att du skrivit intyg till en ansökan. Den har nu skickats vidare till Majblomman.</value>
+    </labels>
+    <labels>
+        <fullName>Certifier_or_file</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Certifier or file</shortDescription>
+        <value>Ni kan antingen ange intygsskrivarens epost högre upp i ansökan, eller bifoga ett dokument ovan.</value>
+    </labels>
+    <labels>
+        <fullName>Confirm</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Confirm</shortDescription>
+        <value>Bekräfta</value>
+    </labels>
+    <labels>
+        <fullName>Confirm_Email_Fail_Message</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Confirm Email Fail Message</shortDescription>
+        <value>E-postadresserna stämmer inte överens. Kontrollera stavningen i båda fälten.</value>
+    </labels>
+    <labels>
+        <fullName>Create_forms</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Create forms</shortDescription>
+        <value>Create forms</value>
+    </labels>
+    <labels>
+        <fullName>Declared_Files</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Declared Files</shortDescription>
+        <value>Uppladdade filer</value>
+    </labels>
+    <labels>
+        <fullName>Duplicate_child</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate child</shortDescription>
+        <value>Du kan inte ange samma barn två gånger i samma ansökan.</value>
+    </labels>
+    <labels>
+        <fullName>Emails_not_the_same</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Emails not the same</shortDescription>
+        <value>Den ansökandes och intygsgivarens epost kan inte vara densamma.</value>
+    </labels>
+    <labels>
+        <fullName>Info_Text_Attachments</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Info Text Attachments</shortDescription>
+        <value>Bifoga bilaga/bilagor här, t ex normberäkning.</value>
+    </labels>
+    <labels>
+        <fullName>Info_text_for_Intygsgivare_e_post</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Info text for Intygsgivare e-post.</shortDescription>
+        <value>Skriv din intygsskrivares e-post här.</value>
+    </labels>
+    <labels>
+        <fullName>Info_text_for_selecting_L_n_Kommun_LF</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Info text for selecting Län / Kommun / LF</shortDescription>
+        <value>Du söker ekonomiskt stöd hos den majblommeförening där barnet/barnen bor. Välj län, kommun och lokalförening i rullisten.</value>
+    </labels>
+    <labels>
+        <fullName>Informational_Text</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Informational Text</shortDescription>
+        <value>Använd formuläret på denna sida för intyget. Det går också bra att skicka med ett intyg i en PDF. Det är viktigt att intygsskrivarens kontaktuppgifter finns med.</value>
+    </labels>
+    <labels>
+        <fullName>Integritetspolicy</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Integritetspolicy</shortDescription>
+        <value>Genom att kryssa här godkänner jag att Majblomman får behandla uppgivna personuppgifter. Mer information om hur Majblomman använder personuppgifter finns på majblomman.se/integritetspolicy.</value>
+    </labels>
+    <labels>
+        <fullName>Intyg_Epost_Info</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Intyg E-post Info</shortDescription>
+        <value>För att Majblomman ska kunna behandla ansökan måste ett intyg som styrker barnets/barnens situation skickas med. Intyget kan skrivas av någon som känner till barnets/barnens situation, exempelvis en skolsköterska, skolkurator, socialsekreterare, föreningsledare, idrottsledare eller kontaktperson i trossamfund. En vän, granne eller familjemedlem kan inte skriva intyg till ansökan. Genom att ange en intygsskrivare nedan kommer din ansökan att skickas vidare till angiven e-postadress. Intygsskrivaren har då möjligheten att bekräfta att barnets situation i ansökan stämmer, och lägga till egna kommentarer. Kontakta din intygsskrivare så att hen uppmärksammar att en länk kommer skickas ut via epost. Länken är endast giltig i 5 arbetsdagar. Utan ett intyg kommer din ansökan att avslås.</value>
+    </labels>
+    <labels>
+        <fullName>Make_sure_all_fields_completed</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Make sure all fields completed</shortDescription>
+        <value>Vänligen fyll i samtliga fält ovan.</value>
+    </labels>
+    <labels>
+        <fullName>No</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No</shortDescription>
+        <value>Nej</value>
+    </labels>
+    <labels>
+        <fullName>No_email</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No email</shortDescription>
+        <value>Ingen e-postadress!</value>
+    </labels>
+    <labels>
+        <fullName>No_recipients_with_address</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>No recipients with address</shortDescription>
+        <value>Mottagare saknar e-post.</value>
+    </labels>
+    <labels>
+        <fullName>None_of_selected_recipients_email</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>None of selected recipients email</shortDescription>
+        <value>Samtliga mottagare saknar e-post. Kan ej fortsätta.</value>
+    </labels>
+    <labels>
+        <fullName>Please_select_at_least_one_approver</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Please select at least one approver</shortDescription>
+        <value>Vänligt ange minst en “godkännare”</value>
+    </labels>
+    <labels>
+        <fullName>Please_select_at_least_one_row</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Please select at least one row.</shortDescription>
+        <value>Vänligen lägg till minst en rad ovan.</value>
+    </labels>
+    <labels>
+        <fullName>Please_select_rejecting_person</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Please select rejecting person</shortDescription>
+        <value>Vänligen ange minst en person som var delaktig i att avslå denna ansökan.</value>
+    </labels>
+    <labels>
+        <fullName>Recipients</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Recipients</shortDescription>
+        <value>Mottagare</value>
+    </labels>
+    <labels>
+        <fullName>Reject</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Reject</shortDescription>
+        <value>Avslå</value>
+    </labels>
+    <labels>
+        <fullName>Rejected_By</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rejected By</shortDescription>
+        <value>Avvisad av</value>
+    </labels>
+    <labels>
+        <fullName>Rejected_Notes_Reasons</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Rejected Notes/Reasons</shortDescription>
+        <value>Kommentar/anledning till avslag</value>
+    </labels>
+    <labels>
+        <fullName>Request_correct</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Request correct</shortDescription>
+        <value>E-post skickades korrekt. Processen kan ta en stund.</value>
+    </labels>
+    <labels>
+        <fullName>Save</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save</shortDescription>
+        <value>Skicka in</value>
+    </labels>
+    <labels>
+        <fullName>Save_documents_into_files</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Save documents into files</shortDescription>
+        <value>Save documents into files</value>
+    </labels>
+    <labels>
+        <fullName>Select_First_Approver</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select First Approver</shortDescription>
+        <value>Godkänd av (#1):</value>
+    </labels>
+    <labels>
+        <fullName>Select_Kommun</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select Kommun</shortDescription>
+        <value>Välj Kommun</value>
+    </labels>
+    <labels>
+        <fullName>Select_LF</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select LF</shortDescription>
+        <value>Välj Lokalförening</value>
+    </labels>
+    <labels>
+        <fullName>Select_Lan</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select Lan</shortDescription>
+        <value>Välj Län</value>
+    </labels>
+    <labels>
+        <fullName>Select_Second_Approver</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select Second Approver</shortDescription>
+        <value>Godkänd av (#2):</value>
+    </labels>
+    <labels>
+        <fullName>Select_recipients</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Select recipients</shortDescription>
+        <value>Välj mottagare</value>
+    </labels>
+    <labels>
+        <fullName>Selected_recipients</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Selected recipients</shortDescription>
+        <value>Valda mottagare</value>
+    </labels>
+    <labels>
+        <fullName>Selected_recipients_to_send_the_form</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Selected recipients to send the form</shortDescription>
+        <value>Valda mottagare att skicka blanketten till:</value>
+    </labels>
+    <labels>
+        <fullName>Send_documents_to_the_recipients</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Send documents to the recipients</shortDescription>
+        <value>Send documents to the recipients</value>
+    </labels>
+    <labels>
+        <fullName>Send_form</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Send form</shortDescription>
+        <value>Skicka blankett</value>
+    </labels>
+    <labels>
+        <fullName>Some_recipients_no_email</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Some recipients no email</shortDescription>
+        <value>Några mottagare saknar e-post. Mailet kan därför inte skickas till alla mottagare. Vill du fortsätta ändå?</value>
+    </labels>
+    <labels>
+        <fullName>Success</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Success</shortDescription>
+        <value>Klart</value>
+    </labels>
+    <labels>
+        <fullName>Total_summa_not_zero</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Total summa not zero</shortDescription>
+        <value>Totalsumman kan inte vara noll kronor.</value>
+    </labels>
+    <labels>
+        <fullName>Uppgifterna</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Uppgifterna</shortDescription>
+        <value>Jag lovar att uppgifterna jag lämnat är riktiga samt att jag har dokument som stärker lämnade uppgifter vid en eventuell granskning.</value>
+    </labels>
+    <labels>
+        <fullName>Year_pattern_Mismatch</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Year pattern mismatch</shortDescription>
+        <value>Vänligen ange ett giltigt födelseår (max 18 år gammal)</value>
+    </labels>
+    <labels>
+        <fullName>Year_too_low</fullName>
+        <categories>app</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Year too low</shortDescription>
+        <value>Vänligen ange ett godkänt årtal. Barnet får ej vara äldre än 18 år.</value>
+    </labels>
+    <labels>
+        <fullName>Yes</fullName>
+        <categories>forms</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Yes</shortDescription>
+        <value>Ja</value>
+    </labels>
+</CustomLabels>
