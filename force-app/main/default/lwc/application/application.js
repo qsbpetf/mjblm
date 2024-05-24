@@ -165,7 +165,6 @@ export default class Application extends LightningElement {
         this.secondRowList.forEach(row => {
             totalAmount += this.asData(row.amount);
         });
-        this.form.XC_Totalsumma_kr__c = totalAmount;
         // const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.sumSecondRows = totalAmount.toLocaleString('sv-SE');
         this.form.XC_RequestedAmount__c = totalAmount;

@@ -187,12 +187,12 @@
                                                                  message-when-pattern-mismatch="Samordningsnumret består av 10 siffror, där talet 60 är adderat till födelsedatumet. Om personen exempelvis är född den 1 januari 1970 så är samordningsnumret 700161XXXX. Exempel på LMA-nummer 20-000001/1, och det kan skrivas med eller utan skiljetecken."
                                                                  read-only={isCertify}
                                                                  onchange={handleInputChange}></lightning-input>
-                                                <div if:true={isCertify}>
-                                                    <label for="xcSsn" class="slds-form-element__label slds-no-flex">
-                                                        Personnummer/Samordningsnummer/LMA-nummer
-                                                    </label>
-                                                    <div id="xcSsn" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.ssn}</div>
-                                                </div>
+<!--                                                <div if:true={isCertify}>-->
+<!--                                                    <label for="xcSsn" class="slds-form-element__label slds-no-flex">-->
+<!--                                                        Personnummer/Samordningsnummer/LMA-nummer-->
+<!--                                                    </label>-->
+<!--                                                    <div id="xcSsn" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.ssn}</div>-->
+<!--                                                </div>-->
                                             </td>
                                             <td class="small-cell-icon">
                                                 <lightning-button-icon if:true={isApply} name={row.id} icon-name="utility:delete" title="Delete"
@@ -475,7 +475,7 @@
                             <lightning-layout-item size="12" medium-device-size="2" padding="around-small">
                                 <div class="slds-form-element">
                                     <label class="slds-checkbox_toggle slds-grid">
-                                        <span class="slds-form-element__label slds-m-bottom_none">Bor vårdnadshavare tillsammans?</span>
+                                        <span class="slds-form-element__label slds-m-bottom_none">Endast 1 vårdnadshavare?</span>
                                         <input
                                                 required={isApply}
                                                 disabled={isCertify}
