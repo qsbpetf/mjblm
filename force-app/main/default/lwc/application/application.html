@@ -1,6 +1,6 @@
 <template>
     <lightning-card class="slds-p-around_x-large" if:false={valid}>
-        <h1>Link expired</h1>
+        <h1>länken gäller inte längre</h1>
     </lightning-card>
     <lightning-card class="main-card" if:true={valid}>
         <lightning-spinner size="medium" if:true={isLoading}></lightning-spinner>
@@ -18,7 +18,10 @@
                     <lightning-layout multiple-rows="false" horizontal-align="center">
                         <lightning-layout-item size="8">
                             <div class="xc-grey-header">
-                                <h1 class="slds-p-around_medium">Ansökan ekonomiskt stöd till barn</h1>
+                                <h1 class="slds-p-around_medium">
+                                    <span style="font-weight: 800;">Ansökan: </span>
+                                    <span style="font-weight: 600;">ekonomiskt stöd till barn</span>
+                                </h1>
                             </div>
                         </lightning-layout-item>
                     </lightning-layout>
@@ -124,94 +127,333 @@
                 <lightning-layout-item size="12">
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
-                        <div class="slds-p-around_small">Barnet/barnen som ansökan gäller:</div>
+
+
+
                         <lightning-layout multiple-rows="true" horizontal-align="spread">
-                            <lightning-layout-item size="12" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
-                                <!---->
-                                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-bottom_small">
+                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x readonly-input">
+
+                                <table class="slds-table slds-var-m-bottom_small">
                                     <thead>
-                                    <tr class="slds-text-title_caps">
-                                        <template for:each={columns} for:item="column" if:true={column.show}>
-                                            <th key={column.name}>
-                                                <div class="slds-truncate">{column.label}</div>
-                                            </th>
-                                        </template>
+                                    <tr>
+                                        <td colspan="4">
+                                            <div class=""><h3>Barnet/barnen som ansökan gäller:</h3></div>
+                                        </td>
                                     </tr>
                                     </thead>
-                                    <tbody>
-                                    <template if:true={data.length} for:each={data} for:item="row" for:index="index">
-                                        <tr class="inputRows" key={row.rowIndex}>
-                                            <template for:each={columns} for:item="column" if:true={column.show}>
-                                                <td key={column.name}>
-                                                    <c-table-input readonlyy={isCertify} oninputchange={onInputChange}
-                                                                   row={row} column={column}></c-table-input>
-                                                </td>
-                                            </template>
-                                            <td>
-                                                <lightning-button-icon if:true={isApply} data-row-index={row.rowIndex}
-                                                                       icon-name="utility:delete" value={index}
-                                                                       variant="bare"
-                                                                       onclick={remove}></lightning-button-icon>
+                                    <template for:each={rowList} for:item="row" for:index="index">
+                                        <tr class="inputRows" key={row.id}>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Förnamn" type="text" name="firstName" data-id={row.id} value={row.firstName}
+                                                                 title="Förnamn får endast innehålla bokstäver och bindestreck"
+                                                                 read-only={isCertify}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcFirstName" class="slds-form-element__label slds-no-flex">
+                                                        Förnamn
+                                                    </label>
+                                                    <div id="xcFirstName" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.firstName}</div>
+                                                </div>
+
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Efternamn" type="text" name="lastName" data-id={row.id} value={row.lastName}
+                                                                 title="Efternamn får endast innehålla bokstäver och bindestreck"
+                                                                 read-only={isCertify}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcLastName" class="slds-form-element__label slds-no-flex">
+                                                        Efternamn
+                                                    </label>
+                                                    <div id="xcLastName" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.lastName}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Födelseår" type="text" name="year"
+                                                                 data-id={row.id} value={row.year} title={labels.YEAR_PATTERN_MISMATCH}
+                                                                 pattern="2[0-9]{3}" message-when-pattern-mismatch={labels.YEAR_PATTERN_MISMATCH} max-length="4"
+                                                                 read-only={isCertify}
+                                                                 onchange={handleInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcYear" class="slds-form-element__label slds-no-flex">
+                                                        Födelseår
+                                                    </label>
+                                                    <div id="xcYear" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.year}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Personnummer/Samordningsnummer/LMA-nummer" type="text" name="ssn" data-id={row.id} value={row.ssn}
+                                                                 pattern="^(\d{10}|(\d{2}-\d{8})|(\d{2}-\d{6}\/\d{1}))$" field-level-help="Samordningsnumret består av 10 siffror, där talet 60 är adderat till födelsedatumet. Om personen exempelvis är född den 1 januari 1970 så är samordningsnumret 700161XXXX. Exempel på LMA-nummer 20-000001/1, och det kan skrivas med eller utan skiljetecken."
+                                                                 message-when-pattern-mismatch="Samordningsnumret består av 10 siffror, där talet 60 är adderat till födelsedatumet. Om personen exempelvis är född den 1 januari 1970 så är samordningsnumret 700161XXXX. Exempel på LMA-nummer 20-000001/1, och det kan skrivas med eller utan skiljetecken."
+                                                                 read-only={isCertify}
+                                                                 onchange={handleInputChange}></lightning-input>
+<!--                                                <div if:true={isCertify}>-->
+<!--                                                    <label for="xcSsn" class="slds-form-element__label slds-no-flex">-->
+<!--                                                        Personnummer/Samordningsnummer/LMA-nummer-->
+<!--                                                    </label>-->
+<!--                                                    <div id="xcSsn" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.ssn}</div>-->
+<!--                                                </div>-->
+                                            </td>
+                                            <td class="small-cell-icon">
+                                                <lightning-button-icon if:true={isApply} name={row.id} icon-name="utility:delete" title="Delete"
+                                                                       variant="bare" onclick={deleteRow}></lightning-button-icon>
                                             </td>
                                         </tr>
                                     </template>
-                                    <template if:false={data.length}>
-                                        <div if:true={isApply} class="slds-p-around_large">{labels.AT_LEAST_ONE_ROW}
-                                        </div>
-                                    </template>
-                                    </tbody>
                                 </table>
-                                <!---->
+
+                                <lightning-button if:true={isApply}
+                                        variant="brand" label="Fler Barn" title="Fler Barn"
+                                        onclick={addRow} class="slds-button slds-button__neutral slds-var-m-bottom_x-small slds-var-m-left_x-small">
+                                </lightning-button>
+
                             </lightning-layout-item>
-                            <lightning-layout-item if:true={tableErrors} size="12">
-                                <div data-id="no-rows-message" class="slds-p-around-small">
-                                    <ul style="color: red;">
-                                        <li for:each={tableErrors} for:item="tableError" key={tableError}>
-                                            <span if:true={tableError}>{tableError}</span>
-                                        </li>
-                                    </ul>
+                            <lightning-layout-item size="2" class="slds-p-around_small">
+                                <div class="slds-grid slds-grid_pull-padded">
+                                    <div class="slds-col slds-text-align_right slds-align-middle child-count-prefix">
+                                        Totalt antal barn som<br/>ansökan gäller:
+                                    </div>
+                                    <div class="slds-col slds-align-middle child-count">
+                                        <h1>{rowList.length}</h1>
+                                    </div>
                                 </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="5" medium-device-size="4">
-                                <lightning-input
+
+                            <lightning-layout-item size="4" medium-device-size="3">
+                                <lightning-input if:true={isApply}
                                         read-only={isCertify}
                                         data-field="XC_SiblingsAge__c"
                                         value={form.XC_SiblingsAge__c}
                                         type="text"
                                         label="Ålder på övriga syskon som bor hemma"
-                                        onchange={inputChange}></lightning-input>
-                            </lightning-layout-item>
-                            <lightning-layout-item size="3" medium-device-size="2">
-                                <lightning-button
-                                        if:true={isApply}
-                                        variant="neutral"
-                                        class="slds-button slds-button__neutral"
-                                        onclick={add}
-                                        label="Fler Barn"
-                                        title="Fler Barn"></lightning-button>
+                                        onchange={inputChange}
+                                        class="slds-var-m-left_medium">
+                                </lightning-input>
+                                <div if:true={isCertify} class="slds-var-m-left_medium">
+                                    <label for="xcKids" class="slds-form-element__label slds-no-flex">
+                                        Ålder på övriga syskon som bor hemma
+                                    </label>
+                                    <div id="xcKids" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{form.XC_SiblingsAge__c}</div>
+                                </div>
                             </lightning-layout-item>
                         </lightning-layout>
+
+                        <lightning-layout multiple-rows="true" horizontal-align="spread">
+
+                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
+                                <table class="slds-table slds-var-m-bottom_small">
+                                    <thead>
+                                    <tr>
+                                        <td colspan="2">
+                                            <div class=""><h3>Vad söker du stöd för?</h3></div>
+                                        </td>
+                                        <td colspan="1">
+                                            <div class=""><h3>För vilka barn?</h3></div>
+                                        </td>
+                                        <td colspan="1">
+                                            <div class=""><h3>För vilket belopp?</h3></div>
+                                        </td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <template for:each={secondRowList} for:item="row" for:index="index2">
+                                        <tr class="inputRows" key={row.id}>
+                                            <td class="small-cell">
+                                                <div class="slds-form-element" if:true={isApply}>
+                                                    <label for="country-select" class="slds-form-element__label">
+                                                        Välj i rullistan ex. cykel
+                                                        <lightning-helptext content="Rullistan består av valbara underkategorier som är grupperade i kategorier (gråa ej valbara rubriker). Välj en underkategori, exempelvis 'Cykel'."
+                                                                            style="display: inline-block; margin-left: 8px;"></lightning-helptext>
+                                                    </label>
+                                                    <div class="slds-form-element__control">
+                                                        <select id="country-select" class="slds-select" onchange={handleSecondInputChange}
+                                                                readonly={isCertify}
+                                                                name="category" data-id={row.id} value={row.category}>
+                                                            <option value="">-- Välj kategori --</option>
+                                                            <template for:each={optionGroups} for:item="group">
+                                                                <optgroup label={group.label} key={group.label}>
+                                                                    <template for:each={group.options} for:item="option">
+                                                                        <option value={option.value} key={option.value}>{option.text}</option>
+                                                                    </template>
+                                                                </optgroup>
+                                                            </template>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcCategory" class="slds-form-element__label slds-no-flex">
+                                                        Välj i rullistan ex. cykel
+                                                    </label>
+                                                    <div id="xcCategory" class="my-readonly-normal">{row.category}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Vid annat, beskriv" type="text" name="description" required={row.descriptioRequired}
+                                                                 data-id={row.id} value={row.description} disabled={row.descriptionDisabled}
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcDescription" class="slds-form-element__label slds-no-flex">
+                                                        Vid annat, beskriv
+                                                    </label>
+                                                    <div id="xcDescription" class="my-readonly-normal">{row.description}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-select if:true={isApply} label="Välj barn som stödet gäller" name="child" data-id={row.id} value={row.child}
+                                                                  options={childOptions} onchange={handleSecondInputChange}></lightning-select>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcChild" class="slds-form-element__label slds-no-flex">
+                                                        Välj barn som stödet gäller
+                                                    </label>
+                                                    <div id="xcChild" class="my-readonly-normal">{row.child}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Skriv totalt belopp ex. 3000" type="number" name="amount" required="true"
+                                                                 data-id={row.id} value={row.amount}
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcAmount" class="slds-form-element__label slds-no-flex">
+                                                        Skriv totalt belopp ex. 3000
+                                                    </label>
+                                                    <div id="xcAmount" class="my-readonly-normal">{row.amount}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell-icon">
+                                                <lightning-button-icon if:true={isApply} name={row.id} icon-name="utility:delete" title="Delete"
+                                                                       variant="bare" onclick={deleteSecondRow}></lightning-button-icon>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr>
+                                        <td class="small-cell" colspan="2">
+                                            <lightning-button if:true={isApply}
+                                                    variant="brand" label="Lägg till rad" title="Lägg till rad"
+                                                    onclick={addSecondRow} class="slds-button slds-button__neutral">
+                                            </lightning-button>
+                                        </td>
+                                        <td class="small-cell-icon">
+                                            <div class="slds-col slds-text-align_right child-count-prefix">
+                                                Totalt<br/>belopp:
+                                            </div>
+                                        </td>
+                                        <td class="small-cell-icon">
+                                            <div class="my-readonly">{form.XC_RequestedAmount__c}</div>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </lightning-layout-item>
+
+
+                        </lightning-layout>
+
+
+
+
+
                     </div>
+<!--                    <div style="border-bottom: 2px solid black;" class="main-card">-->
+
+<!--                        <lightning-layout multiple-rows="true" horizontal-align="spread">-->
+<!--                            <lightning-layout-item size="12" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">-->
+<!--                                &lt;!&ndash;&ndash;&gt;-->
+<!--                                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-bottom_small">-->
+<!--                                    <thead>-->
+<!--                                        <tr class="slds-text-title_caps">-->
+<!--                                            <template for:each={columns} for:item="column" if:true={column.show}>-->
+<!--                                                <th key={column.name}>-->
+<!--                                                    <div class="slds-truncate">{column.label}</div>-->
+<!--                                                </th>-->
+<!--                                            </template>-->
+<!--                                        </tr>-->
+<!--                                    </thead>-->
+<!--                                    <tbody>-->
+<!--                                        <template if:true={data.length} for:each={data} for:item="row" for:index="index">-->
+<!--                                            <tr class="inputRows" key={row.rowIndex}>-->
+<!--                                                <template for:each={columns} for:item="column" if:true={column.show}>-->
+<!--                                                    <td key={column.name}>-->
+<!--                                                        <c-table-input readonlyy={isCertify} oninputchange={onInputChange}-->
+<!--                                                                       row={row} column={column}></c-table-input>-->
+<!--                                                    </td>-->
+<!--                                                </template>-->
+<!--                                                <td>-->
+<!--                                                    <lightning-button-icon if:true={isApply} data-row-index={row.rowIndex}-->
+<!--                                                                           icon-name="utility:delete" value={index}-->
+<!--                                                                           variant="bare"-->
+<!--                                                                           onclick={remove}></lightning-button-icon>-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                        </template>-->
+<!--                                        <template if:false={data.length}>-->
+<!--                                            <div if:true={isApply} class="slds-p-around_large">{labels.AT_LEAST_ONE_ROW}-->
+<!--                                            </div>-->
+<!--                                        </template>-->
+<!--                                    </tbody>-->
+<!--                                </table>-->
+<!--                                &lt;!&ndash;&ndash;&gt;-->
+<!--                            </lightning-layout-item>-->
+<!--                            <lightning-layout-item if:true={tableErrors} size="12">-->
+<!--                                <div data-id="no-rows-message" class="slds-p-around-small">-->
+<!--                                    <ul style="color: red;">-->
+<!--                                        <li for:each={tableErrors} for:item="tableError" key={tableError}>-->
+<!--                                            <span if:true={tableError}>{tableError}</span>-->
+<!--                                        </li>-->
+<!--                                    </ul>-->
+<!--                                </div>-->
+<!--                            </lightning-layout-item>-->
+<!--                            <lightning-layout-item size="5" medium-device-size="4">-->
+<!--                                <lightning-input-->
+<!--                                        read-only={isCertify}-->
+<!--                                        data-field="XC_SiblingsAge__c"-->
+<!--                                        value={form.XC_SiblingsAge__c}-->
+<!--                                        type="text"-->
+<!--                                        label="Ålder på övriga syskon som bor hemma"-->
+<!--                                        onchange={inputChange}></lightning-input>-->
+<!--                            </lightning-layout-item>-->
+<!--                            <lightning-layout-item size="3" medium-device-size="2">-->
+<!--                                <lightning-button-->
+<!--                                        if:true={isApply}-->
+<!--                                        variant="neutral"-->
+<!--                                        class="slds-button slds-button__neutral"-->
+<!--                                        onclick={add}-->
+<!--                                        label="Fler Barn"-->
+<!--                                        title="Fler Barn"></lightning-button>-->
+<!--                            </lightning-layout-item>-->
+<!--                        </lightning-layout>-->
+<!--                    </div>-->
                 </lightning-layout-item>
+
+
                 <!-- PERSONAL INFO -->
+
                 <lightning-layout-item size="12">
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
                         <lightning-layout multiple-rows="true" horizontal-align="spread" vertical-align="top">
-                            <lightning-layout-item size="12" medium-device-size="4">
-                                <lightning-input
+                            <lightning-layout-item size="12">
+                                <label>Fyll i vårdnadshavare</label>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Vardnadshavare__c"
                                         field-level-help="Texta förnamn & efternamn. Majblomman kommunicerar med den här vårdnadshavaren."
-                                        value={form.XC_Vardnadshavare__c} type="text" placeholder="Vårdnadshavare"
+                                        value={form.XC_Vardnadshavare__c} type="text"
                                         label="Sökande Vårdnadshavare" onchange={inputChange}>
                                 </lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcParent1" class="slds-form-element__label slds-no-flex">
+                                        Sökande Vårdnadshavare
+                                    </label>
+                                    <div id="xcParent1" class="my-readonly-normal">{form.XC_Vardnadshavare__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         read-only={isCertify}
@@ -219,15 +461,21 @@
                                         required={isApply}
                                         field-level-help="Om du är ensam vårdnadshavare fyller du i ditt namn igen i detta fält."
                                         value={form.XC_Vardnadshavare1__c}
-                                        type="text" placeholder="Vårdnadshavare"
+                                        type="text"
                                         label="Vårdnadshavare 2"
                                         onchange={inputChange}>
                                 </lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcParent2" class="slds-form-element__label slds-no-flex">
+                                        Vårdnadshavare 2
+                                    </label>
+                                    <div id="xcParent2" class="my-readonly-normal">{form.XC_Vardnadshavare1__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="3">
+                            <lightning-layout-item size="12" medium-device-size="2" padding="around-small">
                                 <div class="slds-form-element">
                                     <label class="slds-checkbox_toggle slds-grid">
-                                        <span class="slds-form-element__label slds-m-bottom_none">Bor vårdnadshavare tillsammans?</span>
+                                        <span class="slds-form-element__label slds-m-bottom_none">Endast 1 vårdnadshavare?</span>
                                         <input
                                                 required={isApply}
                                                 disabled={isCertify}
@@ -245,8 +493,8 @@
                                     </label>
                                 </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="5">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -254,36 +502,52 @@
                                         data-field="XC_Bostadsadress__c"
                                         value={form.XC_Bostadsadress__c}
                                         type="text"
-                                        placeholder="Bostadsadress"
                                         label="Bostadsadress"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcBAddr" class="slds-form-element__label slds-no-flex">
+                                        Bostadsadress
+                                    </label>
+                                    <div id="xcBAddr" class="my-readonly-normal">{form.XC_Bostadsadress__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="5">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         read-only={isCertify}
                                         field-level-help="Om ni bor inneboende"
                                         data-field="XC_C_O_Adress__c"
                                         value={form.XC_C_O_Adress__c}
-                                        type="text" placeholder="C/o adress"
+                                        type="text"
                                         label="C/o adress"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcCOAddr" class="slds-form-element__label slds-no-flex">
+                                        C/o adress
+                                    </label>
+                                    <div id="xcCOAddr" class="my-readonly-normal">{form.XC_C_O_Adress__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="2">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="2" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         read-only={isCertify}
                                         data-field="XC_Lagenhetsnummer__c"
                                         value={form.XC_Lagenhetsnummer__c}
                                         type="text"
-                                        placeholder="Lägenhetsnummer"
                                         label="Lägenhetsnummer"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcLghNr" class="slds-form-element__label slds-no-flex">
+                                        Lägenhetsnummer
+                                    </label>
+                                    <div id="xcLghNr" class="my-readonly-normal">{form.XC_Lagenhetsnummer__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="2">
-                                <lightning-input
+                            <lightning-layout-item size="6" medium-device-size="2" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -291,12 +555,17 @@
                                         data-field="XC_Postnummer__c"
                                         value={form.XC_Postnummer__c}
                                         type="text"
-                                        placeholder="Postnummer"
                                         label="Postnummer"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcPostNr" class="slds-form-element__label slds-no-flex">
+                                        Postnummer
+                                    </label>
+                                    <div id="xcPostNr" class="my-readonly-normal">{form.XC_Postnummer__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="4">
-                                <lightning-input
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -304,13 +573,18 @@
                                         data-field="XC_Ort__c"
                                         value={form.XC_Ort__c}
                                         type="text"
-                                        placeholder="Ort"
                                         label="Ort"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcOrt" class="slds-form-element__label slds-no-flex">
+                                        Ort
+                                    </label>
+                                    <div id="xcOrt" class="my-readonly-normal">{form.XC_Ort__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="6"></lightning-layout-item>
-                            <lightning-layout-item size="6">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="7" padding="horizontal-small"></lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -318,12 +592,17 @@
                                         data-field="XC_Epost__c"
                                         value={form.XC_Epost__c}
                                         type="email"
-                                        placeholder="E-Post"
                                         label="E-Post"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcEpost" class="slds-form-element__label slds-no-flex">
+                                        E-Post
+                                    </label>
+                                    <div id="xcEpost" class="my-readonly-normal">{form.XC_Epost__c}</div>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="5"  padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -331,15 +610,16 @@
                                         data-field="Confirm_XC_Epost__c"
                                         value={form.Confirm_XC_Epost__c}
                                         type="email"
-                                        placeholder="Bekräfta E-Post"
                                         label="Bekräfta E-Post"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" if:true={emailNotTheSame}>
-                                <span class="xc-red" data-id="emails-not-the-same">{labels.CONFIRM_EMAIL_FAIL_MSG}</span>
+                            <lightning-layout-item size="12" medium-device-size="2" padding="horizontal-small">
+                                <div if:true={emailNotTheSame} class="xc-red small-text" data-id="emails-not-the-same">
+                                    {labels.CONFIRM_EMAIL_FAIL_MSG}
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6">
-                                <lightning-input
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+                                <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -347,9 +627,14 @@
                                         data-field="XC_Telefonnummer__c"
                                         value={form.XC_Telefonnummer__c}
                                         type="text"
-                                        placeholder="Telefonnummer"
                                         label="Telefonnummer"
                                         onchange={inputChange}></lightning-input>
+                                <div if:true={isCertify}>
+                                    <label for="xcPhone" class="slds-form-element__label slds-no-flex">
+                                        Telefonnummer
+                                    </label>
+                                    <div id="xcPhone" class="my-readonly-normal">{form.XC_Telefonnummer__c}</div>
+                                </div>
                             </lightning-layout-item>
                         </lightning-layout>
                     </div>
@@ -362,7 +647,7 @@
                             <lightning-layout-item size="12">
                                 <label>Fyll i dina inkomster per månad EFTER skatt. FAMILJENS samlade inkomst skall fyllas i. Där ni inte har inkomst skriver ni 0.</label>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -374,11 +659,10 @@
                                         data-field="XC_Barnbidrag_kr__c"
                                         value={form.XC_Barnbidrag_kr__c}
                                         type="number"
-                                        placeholder="Barnbidrag (kr)"
                                         label="Barnbidrag (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -390,11 +674,10 @@
                                         data-field="XC_Underhall_kr__c"
                                         value={form.XC_Underhall_kr__c}
                                         type="number"
-                                        placeholder="Underhåll (kr)"
                                         label="Underhåll (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -406,11 +689,10 @@
                                         data-field="XC_Bostadsbidrag_kr__c"
                                         value={form.XC_Bostadsbidrag_kr__c}
                                         type="number"
-                                        placeholder="Bostadsbidrag (kr)"
                                         label="Bostadsbidrag (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -422,11 +704,10 @@
                                         data-field="XC_Lon_kr__c"
                                         value={form.XC_Lon_kr__c}
                                         type="number"
-                                        placeholder="Lön (kr)"
                                         label="Lön (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -438,11 +719,10 @@
                                         data-field="XC_Foraldrapenning_kr__c"
                                         value={form.XC_Foraldrapenning_kr__c}
                                         type="number"
-                                        placeholder="Föräldrapenning (kr)"
                                         label="Föräldrapenning (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -454,11 +734,10 @@
                                         data-field="XC_Omvardnadsbidrag_kr__c"
                                         value={form.XC_Omvardnadsbidrag_kr__c}
                                         type="number"
-                                        placeholder="Omvårdnadsbidrag (kr)"
                                         label="Omvårdnadsbidrag (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -470,11 +749,10 @@
                                         data-field="XC_Sjukpenning_kr__c"
                                         value={form.XC_Sjukpenning_kr__c}
                                         type="number"
-                                        placeholder="Sjukpenning (kr)"
                                         label="Sjukpenning (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -486,11 +764,10 @@
                                         data-field="XC_Forsorjningsstod_kr__c"
                                         value={form.XC_Forsorjningsstod_kr__c}
                                         type="number"
-                                        placeholder="Försörjningsstöd (kr)"
                                         label="Försörjningsstöd (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -502,11 +779,10 @@
                                         data-field="XC_Studiebidrag_kr__c"
                                         value={form.XC_Studiebidrag_kr__c}
                                         type="number"
-                                        placeholder="Studiebidrag (kr)"
                                         label="Studiebidrag (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -518,11 +794,10 @@
                                         data-field="XC_A_kassa_kr__c"
                                         value={form.XC_A_kassa_kr__c}
                                         type="number"
-                                        placeholder="A-kassa (kr)"
                                         label="A-kassa (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -534,48 +809,71 @@
                                         data-field="XC_Ovrigt_kr__c"
                                         value={form.XC_Ovrigt_kr__c}
                                         type="number"
-                                        placeholder="Övrigt (kr)"
                                         label="Övrigt (kr)"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
+<!--                                <label class="slds-form-element__label slds-no-flex">-->
+<!--                                    Totalsumma (kr)-->
+<!--                                </label>-->
+<!--                                <div class="totalsumma slds-p-left_small">-->
+<!--                                    <span if:true={form.XC_Totalsumma_kr__c}> {form.XC_Totalsumma_kr__c} </span>-->
+<!--                                    <span if:false={form.XC_Totalsumma_kr__c}> 0 </span>-->
+<!--                                </div>-->
+
                                 <label class="slds-form-element__label slds-no-flex">
                                     Totalsumma (kr)
                                 </label>
-                                <div class="totalsumma slds-p-left_small">
-                                    <span if:true={form.XC_Totalsumma_kr__c}> {form.XC_Totalsumma_kr__c} </span>
-                                    <span if:false={form.XC_Totalsumma_kr__c}> 0 </span>
-                                </div>
+                                <div class="my-readonly" if:true={form.XC_Totalsumma_kr__c}> {form.XC_Totalsumma_kr__c}</div>
+                                <div class="my-readonly" if:false={form.XC_Totalsumma_kr__c}> 0 </div>
+
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="9">
+                            <lightning-layout-item size="6" medium-device-size="9" padding="horizontal-small">
                             </lightning-layout-item>
-                            <lightning-layout-item size="6" medium-device-size="3">
-                                <span data-id="totalsumma" if:false={form.XC_Totalsumma_kr__c} class="xc-red">{labels.TOTALSUMMA_NOT_ZERO}</span>
+                            <lightning-layout-item size="6" medium-device-size="3" padding="horizontal-small">
+                                <span data-id="totalsumma" if:false={form.XC_Totalsumma_kr__c} class="small-text xc-red">{labels.TOTALSUMMA_NOT_ZERO}</span>
                             </lightning-layout-item>
                         </lightning-layout>
                     </div>
                 </lightning-layout-item>
+
                 <!-- REQUEST -->
+
                 <lightning-layout-item size="12">
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
                         <lightning-layout multiple-rows="true" horizontal-align="spread" vertical-align="top">
-                            <lightning-layout-item size="4">
-                                <lightning-input
-                                        data-validity-check="true"
-                                        required={isApply}
-                                        read-only={isCertify}
-                                        min="1" step="0.01"
-                                        message-when-range-underflow="Fyll i detta fält"
-                                        data-field="XC_RequestedAmount__c"
-                                        value={form.XC_RequestedAmount__c}
-                                        type="number"
-                                        label="Vi ansöker från Majblomman om summan (kronor)"
-                                        onchange={inputChange}></lightning-input>
-                            </lightning-layout-item>
-                            <lightning-layout-item size="8"></lightning-layout-item>
                             <lightning-layout-item size="12">
-                                <lightning-textarea
+                                <label>Ansökans totala belopp beskrivning.</label>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
+
+
+                                <label for="mytotal" class="slds-form-element__label slds-no-flex">
+                                    <abbr title="required" class="slds-required">*</abbr>
+                                    Vi ansöker från Majblomman om summan (kronor)
+                                </label>
+                                <div id="mytotal" class="my-readonly">{form.XC_RequestedAmount__c}</div>
+
+
+<!--                                <lightning-input-->
+<!--                                        data-validity-check="true"-->
+<!--                                        required={isApply}-->
+<!--                                        read-only="true"-->
+<!--                                        min="1" step="0.01"-->
+<!--                                        message-when-range-underflow="Fyll i detta fält"-->
+<!--                                        data-field="XC_RequestedAmount__c"-->
+<!--                                        value={form.XC_RequestedAmount__c}-->
+<!--                                        type="number"-->
+<!--                                        label="Vi ansöker från Majblomman om summan (kronor)">-->
+<!--                                </lightning-input>-->
+
+
+
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="7" padding="horizontal-small"></lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="12" padding="horizontal-small">
+                                <lightning-textarea if:true={isApply}
                                         min-length="20"
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -589,17 +887,26 @@
                                         type="text"
                                         onchange={inputChange}
                                         style="display: block;"></lightning-textarea>
+                                <div if:true={isCertify}>
+                                    <label for="xcRequest" class="slds-form-element__label slds-no-flex">
+                                        Beskriv barnets situation och behov samt vad ett stöd från Majblomman ska användas till.
+                                    </label>
+                                    <div id="xcRequest" class="my-readonly-normal">{form.XC_Request__c}</div>
+                                </div>
                             </lightning-layout-item>
                         </lightning-layout>
                     </div>
                 </lightning-layout-item>
+
                 <!-- BANK INFO -->
                 <lightning-layout-item size="12" if:true={isApply}>
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
-                        <label>Ekonomiskt stöd beviljas i första hand till presentkort. I undantagsfall beviljas pengar istället för presentkort, och då i efterhand mot uppvisande av kvitto eller faktura. Utbetalning önskas till följande konto:</label>
-                        <lightning-layout multiple-rows="true" horizontal-align="start" vertical-align="center">
-                            <lightning-layout-item size="12" medium-device-size="6">
+                        <lightning-layout multiple-rows="true" horizontal-align="spread" vertical-align="top">
+                            <lightning-layout-item size="12">
+                                <label>Ekonomiskt stöd beviljas i första hand till presentkort. I undantagsfall beviljas pengar istället för presentkort, och då i efterhand mot uppvisande av kvitto eller faktura. Utbetalning önskas till följande konto:</label>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -610,7 +917,7 @@
                                         label="Bankens Namn"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="3">
+                            <lightning-layout-item size="12" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -624,7 +931,7 @@
                                         onchange={inputChange}
                                 ></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="3">
+                            <lightning-layout-item size="12" medium-device-size="3" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -637,7 +944,7 @@
                                         label="Kontonummer"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="7">
+                            <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -648,17 +955,19 @@
                                         label="Kontoinnehavare"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="5"></lightning-layout-item>
+                            <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small"></lightning-layout-item>
                         </lightning-layout>
                     </div>
                 </lightning-layout-item>
+
                 <!-- CERTIFIER INFO -->
+
                 <lightning-layout-item size="12" if:true={isApply}>
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
                         <label class="slds-m-bottom_medium slds-show_inline-block">{labels.INTYG_EPOST_INFO}</label>
-                        <lightning-layout multiple-rows="true" horizontal-align="start" vertical-align="center">
-                            <lightning-layout-item size="12" medium-device-size="4">
+                        <lightning-layout multiple-rows="true" horizontal-align="spread" vertical-align="top">
+                            <lightning-layout-item size="12" medium-device-size="5"  padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -667,11 +976,10 @@
                                         value={form.XC_IntygsskrivarensEpost__c}
                                         type="email"
                                         field-level-help={labels.INFO_TEXT_INTYGSGIVARE_EPOST}
-                                        placeholder="Intygsskrivarens E-post"
                                         label="Intygsskrivarens E-post"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="5"  padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -680,12 +988,13 @@
                                         value={form.Confirm_XC_IntygsskrivarensEpost__c}
                                         type="email"
                                         field-level-help={labels.INFO_TEXT_INTYGSGIVARE_EPOST}
-                                        placeholder="Bekräfta Intygsskrivarens E-post"
                                         label="Bekräfta Intygsskrivarens E-post"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" if:true={intygsEmailNotTheSame}>
-                                <span class="xc-red" data-id="intygs-emails-not-the-same">{labels.CONFIRM_EMAIL_FAIL_MSG}</span>
+                            <lightning-layout-item size="12" medium-device-size="2" padding="horizontal-small">
+                                <div if:true={intygsEmailNotTheSame} class="xc-red  small-text" data-id="intygs-emails-not-the-same">
+                                    {labels.CONFIRM_EMAIL_FAIL_MSG}
+                                </div>
                             </lightning-layout-item>
                             <lightning-layout-item size="12">
                                 <span data-id="intygsgivarenspost" class="xc-red hide">{labels.EMAILS_NOT_THE_SAME}</span>
@@ -696,9 +1005,12 @@
                 <!-- FROM CERTIFIER -->
                 <lightning-layout-item if:true={isCertify} size="12" class="slds-p-around-medium">
                     <lightning-layout multiple-rows="false" horizontal-align="center">
-                        <lightning-layout-item size="8">
+                        <lightning-layout-item size="8" padding="around-medium">
                             <div class="xc-grey-header">
-                                <h1 class="slds-p-around_medium">Intyg: ekonomiskt stöd till barn</h1>
+                                <h1 class="slds-p-around_medium">
+                                    <span style="font-weight: 800;">Intyg: </span>
+                                    <span style="font-weight: 600;">ekonomiskt stöd till barn</span>
+                                </h1>
                             </div>
                         </lightning-layout-item>
                     </lightning-layout>
@@ -716,10 +1028,10 @@
                     </div>
                 </lightning-layout-item>
                 <lightning-layout-item if:true={isCertify} size="12">
-                    <div style="text-align: center; border-bottom: 2px solid black;"
+                    <div style="text-align: left; border-bottom: 2px solid black;"
                          class="main-card">
                         <lightning-layout multiple-rows="false" horizontal-align="end" vertical-align="center">
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="4" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -727,11 +1039,10 @@
                                         data-field="XC_IntygsskrivarensNamn__c"
                                         value={form.XC_IntygsskrivarensNamn__c}
                                         type="text"
-                                        placeholder="Intygsskrivarens namn"
                                         label="Intygsskrivarens namn"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="4" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -739,22 +1050,20 @@
                                         data-field="XC_IntygsskrivarensTelefonnummer__c"
                                         value={form.XC_IntygsskrivarensTelefonnummer__c}
                                         type="text"
-                                        placeholder="Telefonnummer"
                                         label="Telefonnummer"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="4" padding="horizontal-small">
                                 <lightning-input
                                         data-validity-check="true"
                                         required
                                         data-field="XC_IntygsskrivarensEpost__c"
                                         value={form.XC_IntygsskrivarensEpost__c}
                                         type="email"
-                                        placeholder="E-post"
                                         label="E-post"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="4" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -762,11 +1071,10 @@
                                         data-field="XC_YrkeRoll__c"
                                         value={form.XC_YrkeRoll__c}
                                         type="text"
-                                        placeholder="Yrke/Roll"
                                         label="Yrke/Roll"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="4">
+                            <lightning-layout-item size="12" medium-device-size="4" padding="horizontal-small">
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
@@ -774,7 +1082,6 @@
                                         data-field="XC_ArbetsplatsForening__c"
                                         value={form.XC_ArbetsplatsForening__c}
                                         type="text"
-                                        placeholder="Arbetsplats/förening"
                                         label="Arbetsplats/förening"
                                         onchange={inputChange}></lightning-input>
                             </lightning-layout-item>
@@ -787,7 +1094,8 @@
                     <div style="text-align: left; border-bottom: 2px solid black;"
                          class="main-card">
                         <lightning-layout multiple-rows="false" horizontal-align="start" vertical-align="center">
-                            <lightning-layout-item size="6">
+
+                            <lightning-layout-item size="6" padding="horizontal-small">
                                 <div class="slds-form-element">
                                     <label class="slds-checkbox_toggle slds-grid">
                                         <span class="slds-form-element__label slds-m-bottom_none">Jag vill lämna intyg?</span>
@@ -806,22 +1114,30 @@
                                     </label>
                                 </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" if:true={certifierRejected}>
-                                <label for="info2">Anledning till att jag inte vill lämna intyg: (valfritt)</label>
+
+                            <lightning-layout-item size="12" if:true={certifierRejected} padding="around-small">
+                                <label for="info2" class="slds-form-element__label slds-no-flex" style="position: absolute">
+                                    Anledning till att jag inte vill lämna intyg: (valfritt)
+                                </label>
                                 <lightning-textarea data-validity-check="true" name="rejectionInfo" id="info2"
                                                     data-field="XC_CertifierRejectionInfo__c"
+                                                    value={form.XC_CertifierRejectionInfo__c}
                                                     data-type="text" onchange={inputChange}></lightning-textarea>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" if:false={certifierRejected}>
-                                <label for="info1">Detta skulle ekonomiskt stöd från Majblomman innebära för
-                                    barnet/barnen.
+
+                            <lightning-layout-item size="12" if:false={certifierRejected} padding="around-small">
+                               <label for="info1" class="slds-form-element__label slds-no-flex" style="position: absolute">
+                                    <abbr title="required" class="slds-required">*</abbr>
+                                    Detta skulle ekonomiskt stöd från Majblomman innebära för barnet/barnen.
                                     <lightning-helptext content="Utgå från vårdnadshavarens ansökan"
                                                         style="display: inline-block; margin-left: 3px;"></lightning-helptext>
-                                </label>
+                               </label>
                                 <lightning-textarea data-validity-check="true" required name="info" id="info1"
                                                     data-field="XC_IntygsskrivarensInfo__c"
+                                                    value={form.XC_IntygsskrivarensInfo__c}
                                                     data-type="text" onchange={inputChange}></lightning-textarea>
                             </lightning-layout-item>
+
                         </lightning-layout>
                     </div>
                 </lightning-layout-item>
@@ -829,13 +1145,17 @@
                 <lightning-layout-item size="12" if:true={isApply}>
                     <div style="border-bottom: 2px solid black;"
                          class="main-card">
-                        <lightning-layout multiple-rows="true" horizontal-align="start" vertical-align="center">
-                            <lightning-layout-item size="12" medium-device-size="4">
-                                <lightning-helptext content={labels.INFO_TEXT_ATTACHMENTS}
-                                                    style="display: inline-block; margin-left: 3px;"></lightning-helptext>
+                        <lightning-layout multiple-rows="true" horizontal-align="start" vertical-align="top">
+                            <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                                <label for="fileUploader" class="slds-form-element__label" style="position: absolute">
+                                    Ladda upp dokument
+                                    <lightning-helptext content={labels.INFO_TEXT_ATTACHMENTS}
+                                                        style="display: inline-block; margin-left: 3px;"></lightning-helptext>
+                                </label>
                                 <lightning-file-upload
-                                        label="Ladda upp dokument"
+                                        id="fileUploader"
                                         name="fileUploader"
+                                        label=""
                                         onuploadfinished={handleUploadFinished}
                                         file-field-name="XC_Form_fileupload__c"
                                         file-field-value={idForFile}
@@ -843,17 +1163,29 @@
                                 >
                                 </lightning-file-upload>
 
-                                <div for:each={uploadedFiles} for:item="file" key={file.index}>{file.name}</div>
+                                <template if:true={uploadedFiles.length}>
+                                    <div class="slds-m-top_large slds-m-bottom_large">
+                                        Uppladdade filer :
+                                        <ul>
+                                            <template for:each={uploadedFiles} for:item="file" key={file.name}>
+                                                <li key={file.name}>{file.name}</li>
+                                            </template>
+                                        </ul>
+                                    </div>
+                                </template>
+
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" medium-device-size="8" if:true={isApply}>
-                                <lightning-checkbox-group name="declaredFiles"
-                                                          label={labels.DECLARED_FILES}
-                                                          options={declaredFilesOptions}
-                                                          value={declaredFiles}
-                                                          onchange={handleDeclaredFilesChange}></lightning-checkbox-group>
+                            <lightning-layout-item size="12" medium-device-size="6" padding="horizontal-small">
+                                <div if:true={isApply}>
+                                    <lightning-checkbox-group name="declaredFiles"
+                                                              label={labels.DECLARED_FILES}
+                                                              options={declaredFilesOptions}
+                                                              value={declaredFiles}
+                                                              onchange={handleDeclaredFilesChange}></lightning-checkbox-group>
+                                </div>
                             </lightning-layout-item>
-                            <lightning-layout-item size="12" if:true={isApply}>
-                                <span data-id="filesInfo">{filesInfo}</span>
+                            <lightning-layout-item size="12" padding="around-small">
+                                <span data-id="filesInfo" if:true={isApply}>{filesInfo}</span>
                             </lightning-layout-item>
                         </lightning-layout>
                     </div>
