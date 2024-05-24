@@ -37,6 +37,7 @@ export default class ApplicationTree extends LightningElement {
 
     @track latestApplications = [];
     @track urls = [];
+    @track disabledButton = true;
 
 
     // TODO: Add validation, if application is 'Approved' then disable the 'Redigera' button and 'Lägg till nytt bidrag' button
@@ -367,7 +368,7 @@ export default class ApplicationTree extends LightningElement {
             //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount, ' Status icon=', child.statusIcon);
         });
 
-        //if false allchildren.. disable button
+        this.disabledButton = !allChildrenValidated;
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.totalRequested = formatter.format(this._totalRequested);
