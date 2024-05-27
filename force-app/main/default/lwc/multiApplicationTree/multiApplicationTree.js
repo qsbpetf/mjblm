@@ -269,10 +269,28 @@ export default class MultiApplicationTree extends LightningElement {
             rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
             rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
-            if (this.asCount(event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value) === 0) {
-                this.selectedRows = this.selectedRows.filter(row => row !== rec.Application__c);
+            // if (this.asCount(event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value) === 0) {
+            //     this.selectedRows = this.selectedRows.filter(row => row !== rec.Application__c);
+            // }
+            let child = this.barn[rec.Barnet_ApplicationEntry__c];
+            let request = child._children.find(item => item.id === rec.Id);
+            request.request = rec.Ans_kt_V_rde_Kontanter_Presentkort__c;
+            let app = this.data.find(item => item.id === rec.Application__c);
+            console.log('Found app: ', app);
+            let pageChild = app._children.find(item => item.id === rec.Barnet_ApplicationEntry__c);
+            console.log('Found pageChild: ', pageChild);
+            let pageRequest = pageChild._children.find(item => item.id === rec.Id);
+            if (pageRequest) {
+                console.log('Found page request: ', pageRequest);
+                pageRequest.request = rec.Ans_kt_V_rde_Kontanter_Presentkort__c;
+                pageRequest.granted = rec.Beviljat_V_rde_Presentkort_Kontanter__c;
+                pageRequest.category = rec.Kategori__c;
+                pageRequest.subCategory = rec.Underkategori__c;
+                pageRequest.paymentType = rec.Kontanter_Presentkort__c;
+                pageRequest.description = rec.Annat_Beskrivning__c;
             }
-            this.data = this.buildTree();
+            this.recalculateTree();
+            this.paginate();
         }
         this.isModalOpen = false;
     }
@@ -526,7 +544,7 @@ export default class MultiApplicationTree extends LightningElement {
                     app.grantedTotalCount += 1;
                     //validate method
                     const isValid = this.validateApplication(request)
-                    console.log(isValid);
+                    // console.log(isValid);
                     app.allChildrenValidated &= isValid;
 
                 });
@@ -559,21 +577,7 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     validateApplication(row){
-        console.log(JSON.stringify(row));
+        // console.log(JSON.stringify(row));
         return this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory);
     }
-
-    //if we send child._children instead 
-    // validateApplication(rows){
-    //     if (rows.length === 0){
-    //         return false;
-    //     }
-    //     let validatedRow = 0;
-    //     rows.forEach(row => {
-    //         if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
-    //             validatedRow += 1;
-    //         }
-    //     });
-    //     return rows.length === validatedRow;
-    // }
 }
