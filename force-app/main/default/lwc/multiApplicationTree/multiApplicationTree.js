@@ -452,6 +452,7 @@ export default class MultiApplicationTree extends LightningElement {
                     granted: 0,
                     grantedTotalCount: 0,
                     grantedDefinedCount: 0,
+                    allChildrenValidated: true,
                     action: 'Nytt Bidrag',
                     icon: 'utility:add',
                     _children: []
@@ -484,13 +485,13 @@ export default class MultiApplicationTree extends LightningElement {
             this.recalculateTree();
         });
 
-        Object.entries(this.apps).forEach(([key, app]) => {
-            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
-        });
+        // Object.entries(this.apps).forEach(([key, app]) => {
+        //     app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
+        // });
 
-        const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
-        this.totalRequested = formatter.format(this._totalRequested);
-        this.totalGranted = formatter.format(this._totalGranted);
+        // const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        // this.totalRequested = formatter.format(this._totalRequested);
+        // this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
     }
@@ -523,6 +524,7 @@ export default class MultiApplicationTree extends LightningElement {
             app.granted = 0;
             app.grantedDefinedCount = 0;
             app.grantedTotalCount = 0;
+            app.allChildrenValidated = true;
             app._children.forEach(child => {
                 child.request = 0;
                 child.granted = 0;
@@ -539,6 +541,10 @@ export default class MultiApplicationTree extends LightningElement {
                     app.granted += this.asData(request.granted);
                     app.grantedDefinedCount += this.asCount(request.granted);
                     app.grantedTotalCount += 1;
+                    //validate method
+                    const isValid = this.validateApplication(request)
+                    // console.log(isValid);
+                    app.allChildrenValidated &= isValid;
 
                 });
                 child.name = child.originalName + ' ' + child.grantedDefinedCount + '/' + child.grantedTotalCount;
@@ -547,7 +553,7 @@ export default class MultiApplicationTree extends LightningElement {
         });
 
         Object.entries(this.apps).forEach(([key, app]) => {
-            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount) ? 'action:approval' : 'action:new_note';
+            app.statusIcon = (app.grantedTotalCount === app.grantedDefinedCount && app.allChildrenValidated) ? 'action:approval' : 'action:new_note';
         });
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
@@ -563,5 +569,14 @@ export default class MultiApplicationTree extends LightningElement {
     asCount(param) {
         let digitRegExp = /^\d+$/;
         return (digitRegExp.test(param)) ? 1 : 0;
+    }
+
+    hasText(param) {
+        return !(param === undefined || param === null || param.length === 0)
+    }
+
+    validateApplication(row){
+        // console.log(JSON.stringify(row));
+        return this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory);
     }
 }
