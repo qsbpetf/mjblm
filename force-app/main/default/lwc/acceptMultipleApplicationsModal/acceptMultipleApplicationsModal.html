@@ -1,5 +1,14 @@
 <template>
-    <lightning-modal-header label="Godkänn Ansökningar"></lightning-modal-header>
+    <lightning-modal-header label="Godkänn Ansökningar">
+        <div class="slds-grid slds-p-top_medium" style="font-weight:bold">
+            <div class="slds-col slds-col_padded slds-text-heading_small slds-align_absolute-center">
+                Totalt ansökt belopp: {requestedAmount}
+            </div>
+            <div class="slds-col slds-col_padded slds-text-heading_small slds-align_absolute-center">
+                Totalt beviljat belopp: {grantToApprove}
+            </div>
+        </div>
+    </lightning-modal-header>
     <lightning-modal-body>
         <lightning-spinner if:true={isLoading} size="medium"></lightning-spinner>
         <label for="approver1" class="slds-form-element__label slds-no-flex">

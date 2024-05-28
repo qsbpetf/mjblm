@@ -15,10 +15,27 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     @track disabledButton = true;
     @track disabledCheckbox = true;
     @track disabledSelect = false;
-    
+    @track amountRequested = 0;
+    @track amountGranted = 0;
+
+    @api set requestedAmount(reqAmount) {
+        this.amountRequested = reqAmount;
+    }
+
+    @api set grantToApprove(grantAmount) {
+        this.amountGranted = grantAmount;
+    }
 
     @api set recordIds(rids) {
         this.applicationIds = rids.split(',');
+    }
+
+    get requestedAmount() {
+        return this.amountRequested;
+    }
+
+    get grantToApprove() {
+        return this.amountGranted;
     }
 
     get recordIds() {
