@@ -59,6 +59,7 @@ public inherited sharing class ApplicationFormsService {
                         XC_ArbetsplatsForening__c,
                         XC_ApprovedByCertifier__c,
                         XC_CertifierRejectionInfo__c,
+                        XC_Status__c,
                         (SELECT
                                 Id,
                                 Name,
