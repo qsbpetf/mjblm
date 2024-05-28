@@ -188,7 +188,8 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     validateApp(row) {
-        return (row.level === 1) && (row.grantedTotalCount === row.grantedDefinedCount);
+        console.log(JSON.stringify(row))
+        return (row.level === 1) && (row.grantedTotalCount === row.grantedDefinedCount) && row.allChildrenValidated;
     }
 
     findSelectedRow(event, selectedRowId) {
