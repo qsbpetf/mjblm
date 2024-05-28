@@ -175,6 +175,8 @@ export default class ApplicationTree extends LightningElement {
             rec.Kontanter_Presentkort__c = event.detail.data.fields.Kontanter_Presentkort__c.value;
             rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
             rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
+            rec.Kostnad_majblomman_kr__c = event.detail.data.fields.Kostnad_majblomman_kr__c.value;
+            rec.Kommentar__c = event.detail.data.fields.Kommentar__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
             this.data = this.buildTree();
         }
@@ -208,10 +210,13 @@ export default class ApplicationTree extends LightningElement {
     }
     //open accept application modal
     async handleApproveClick(){
+        
         const result = await AcceptMultipleApplicationsModal.open({
             size: 'medium',
             description: 'Approve',
             recordIds: `${this.recordId}`,
+            grantToApprove: this.totalGranted,
+            requestedAmount: this.totalRequested
         });
 
         if (result === 'ok') {
@@ -329,11 +334,11 @@ export default class ApplicationTree extends LightningElement {
             this.barn[child.Id] = childNode;
             treeData.push(childNode);
         });
-
+       
         if (this.record.Bidragsrader__r === undefined || this.record.Bidragsrader__r === null) {
             return treeData;
         }
-
+       
         this.record.Bidragsrader__r.forEach(child => {
             let childNode = {
                 id: child.Id,
@@ -351,7 +356,7 @@ export default class ApplicationTree extends LightningElement {
             this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
             this.barn[child.Barnet_ApplicationEntry__c].request += this.asData(childNode.request);
             this.barn[child.Barnet_ApplicationEntry__c].granted += this.asData(childNode.granted);
-            this.barn[child.Barnet_ApplicationEntry__c].grantedDefinedCount += this.asCount(childNode.granted)
+            this.barn[child.Barnet_ApplicationEntry__c].grantedDefinedCount += this.asCount(childNode.granted);
             this.barn[child.Barnet_ApplicationEntry__c].grantedTotalCount += 1;
             this._totalRequested += this.asData(childNode.request);
             this._totalGranted += this.asData(childNode.granted);
@@ -361,14 +366,12 @@ export default class ApplicationTree extends LightningElement {
         
         let allChildrenValidated = true;
         Object.entries(this.barn).forEach(([key, child]) => {
-            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount)
             const isValid = (child.grantedTotalCount === child.grantedDefinedCount && this.validateApplication(child._children));
             child.statusIcon = isValid ? 'action:approval' : 'action:new_note';
             allChildrenValidated &= isValid;
-            //console.log('App: Total grant count=', child.grantedTotalCount, ' Defined grant count=', child.grantedDefinedCount, ' Status icon=', child.statusIcon);
         });
 
-        this.disabledButton = !allChildrenValidated;
+        this.disabledButton = !(allChildrenValidated && this.record.XC_Status__c === 'Ready for Decision');
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.totalRequested = formatter.format(this._totalRequested);
