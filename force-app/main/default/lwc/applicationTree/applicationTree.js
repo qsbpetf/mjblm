@@ -151,7 +151,7 @@ export default class ApplicationTree extends LightningElement {
         this.childRecordId = recId;
         this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
         this.childRecordFlowApiName = this.flowApiName;
-        debugger;
+        // debugger;
         // find c-screen-flow component and call startFlow() method
         const flowComponent = this.template.querySelector('c-screen-flow');
         flowComponent.handleStartFlow({
@@ -307,7 +307,7 @@ export default class ApplicationTree extends LightningElement {
         this._totalRequested = 0;
         this._totalGranted = 0;
 
-        debugger;
+        // debugger;
 
         console.log(JSON.stringify(this.record, null, 2));
 

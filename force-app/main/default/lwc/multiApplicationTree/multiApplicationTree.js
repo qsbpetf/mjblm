@@ -316,7 +316,7 @@ export default class MultiApplicationTree extends LightningElement {
         this.childRecordId = childRecId;
         this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
         this.childRecordFlowApiName = this.flowApiName;
-        debugger;
+        // debugger;
         // find c-screen-flow component and call startFlow() method
         const flowComponent = this.template.querySelector('c-screen-flow');
         flowComponent.handleStartFlow({
@@ -361,7 +361,7 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     loadApplications() {
-        debugger;
+        // debugger;
         apexGetAllApplications()
             .then(result => {
                 this.isLoading = false;
@@ -378,7 +378,7 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     paginate() {
-        debugger;
+        // debugger;
         this.pageData = this.data.slice(this.skip, this.pageSize + this.skip);
         this.isFirstPage = this.currentPage === 1;
         this.isLastPage = this.currentPage === this.totalPages;

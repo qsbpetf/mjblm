@@ -19,18 +19,20 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     @track amountGranted = 0;
 
     @api set requestedAmount(reqAmount) {
-        this.amountRequested = reqAmount;
+        const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.amountRequested = formatter.format(reqAmount);
     }
 
     @api set grantToApprove(grantAmount) {
-        this.amountGranted = grantAmount;
+        const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
+        this.amountGranted = formatter.format(grantAmount);
     }
 
     @api set recordIds(rids) {
         this.applicationIds = rids.split(',');
     }
 
-    get requestedAmount() {
+    get requestedAmount() { 
         return this.amountRequested;
     }
 
