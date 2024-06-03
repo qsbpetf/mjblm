@@ -1,5 +1,5 @@
 <template>
-    <section if:true={isOpen}>
+    <!-- <section if:true={isOpen}>
         <lightning-button
                 if:true={readyForApproval}
                 variant="brand"
@@ -13,7 +13,7 @@
                 onclick={handleReject}
                 label={labels.REJECT}
                 title={labels.REJECT}></lightning-button>
-    </section>
+    </section> -->
     <section>
         <lightning-spinner if:true={isLoading} size="small"></lightning-spinner>
         <template if:false={editMode}>

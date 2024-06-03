@@ -5,6 +5,9 @@
 import { LightningElement, api, track } from 'lwc';
 import apexGetApplication from '@salesforce/apex/ApplicationFormsController.getApplication';
 import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsController.getLatestApplications';
+import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
+import RejectApplication from 'c/rejectApplication';
+import {ShowToastEvent} from "lightning/platformShowToastEvent";
 
 export default class ApplicationTree extends LightningElement {
 
@@ -34,6 +37,7 @@ export default class ApplicationTree extends LightningElement {
 
     @track latestApplications = [];
     @track urls = [];
+    @track disabledButton = true;
 
 
     // TODO: Add validation, if application is 'Approved' then disable the 'Redigera' button and 'Lägg till nytt bidrag' button
@@ -103,6 +107,15 @@ export default class ApplicationTree extends LightningElement {
                 variant: 'base'
             },
             initialWidth: 120
+        },
+        {
+            type: 'icon',
+            label: 'Färdigbeh.',
+            cellAttributes: {
+                alternativeText: { fieldName: 'statusIcon' },
+                iconName: { fieldName: 'statusIcon' },
+                size: 'x-small'
+            },
         }
     ];
 
@@ -138,7 +151,7 @@ export default class ApplicationTree extends LightningElement {
         this.childRecordId = recId;
         this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
         this.childRecordFlowApiName = this.flowApiName;
-        debugger;
+        // debugger;
         // find c-screen-flow component and call startFlow() method
         const flowComponent = this.template.querySelector('c-screen-flow');
         flowComponent.handleStartFlow({
@@ -162,6 +175,8 @@ export default class ApplicationTree extends LightningElement {
             rec.Kontanter_Presentkort__c = event.detail.data.fields.Kontanter_Presentkort__c.value;
             rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
             rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
+            rec.Kostnad_majblomman_kr__c = event.detail.data.fields.Kostnad_majblomman_kr__c.value;
+            rec.Kommentar__c = event.detail.data.fields.Kommentar__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
             this.data = this.buildTree();
         }
@@ -192,6 +207,46 @@ export default class ApplicationTree extends LightningElement {
                 }
             }
         }
+    }
+    //open accept application modal
+    async handleApproveClick(){
+        
+        const result = await AcceptMultipleApplicationsModal.open({
+            size: 'medium',
+            description: 'Approve',
+            recordIds: `${this.recordId}`,
+            grantToApprove: this.totalGranted,
+            requestedAmount: this.totalRequested
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+    //open reject application modal
+    async handleReject() {
+        const result = await RejectApplication.open({
+            size: 'medium',
+            description: 'Reject',
+            recordId: `${this.recordId}`,
+        });
+
+        if (result === 'ok') {
+            window.location.reload();
+        } else if (result === 'error') {
+            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+        }
+    }
+
+    showNotification(title, message, variant) {
+        const evt = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant,
+        });
+        this.dispatchEvent(evt);
     }
 
     connectedCallback() {
@@ -252,7 +307,7 @@ export default class ApplicationTree extends LightningElement {
         this._totalRequested = 0;
         this._totalGranted = 0;
 
-        debugger;
+        // debugger;
 
         console.log(JSON.stringify(this.record, null, 2));
 
@@ -270,6 +325,8 @@ export default class ApplicationTree extends LightningElement {
                 birthYear: child.XC_Fodelsear__c,
                 request: 0,
                 granted: 0,
+                grantedTotalCount: 0,
+                grantedDefinedCount: 0,
                 action: 'Nytt Bidrag',
                 icon: 'utility:add',
                 _children: []
@@ -277,11 +334,11 @@ export default class ApplicationTree extends LightningElement {
             this.barn[child.Id] = childNode;
             treeData.push(childNode);
         });
-
+       
         if (this.record.Bidragsrader__r === undefined || this.record.Bidragsrader__r === null) {
             return treeData;
         }
-
+       
         this.record.Bidragsrader__r.forEach(child => {
             let childNode = {
                 id: child.Id,
@@ -297,18 +354,57 @@ export default class ApplicationTree extends LightningElement {
                 icon: 'utility:edit',
             };
             this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
-            this.barn[child.Barnet_ApplicationEntry__c].request += childNode.request || 0;
-            this.barn[child.Barnet_ApplicationEntry__c].granted += childNode.granted || 0;
-            this._totalRequested += childNode.request || 0;
-            this._totalGranted += childNode.granted || 0;
+            this.barn[child.Barnet_ApplicationEntry__c].request += this.asData(childNode.request);
+            this.barn[child.Barnet_ApplicationEntry__c].granted += this.asData(childNode.granted);
+            this.barn[child.Barnet_ApplicationEntry__c].grantedDefinedCount += this.asCount(childNode.granted);
+            this.barn[child.Barnet_ApplicationEntry__c].grantedTotalCount += 1;
+            this._totalRequested += this.asData(childNode.request);
+            this._totalGranted += this.asData(childNode.granted);
             this.dataById[child.Id] = childNode;
             this.recordById[child.Id] = child;
         });
+        
+        let allChildrenValidated = true;
+        Object.entries(this.barn).forEach(([key, child]) => {
+            const isValid = (child.grantedTotalCount === child.grantedDefinedCount && this.validateApplication(child._children));
+            child.statusIcon = isValid ? 'action:approval' : 'action:new_note';
+            allChildrenValidated &= isValid;
+        });
+
+        this.disabledButton = !(allChildrenValidated && this.record.XC_Status__c === 'Ready for Decision');
 
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.totalRequested = formatter.format(this._totalRequested);
         this.totalGranted = formatter.format(this._totalGranted);
 
         return treeData;
+    }
+
+    asData(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? param : 0;
+    }
+
+    asCount(param) {
+        let digitRegExp = /^\d+$/;
+        return (digitRegExp.test(param)) ? 1 : 0;
+    }
+
+    hasText(param) {
+        return !(param === undefined || param === null || param.length === 0)
+    }
+
+    //validates if all rows have category, subcategory and paymentType
+    validateApplication(rows){
+        if (rows.length === 0){
+            return false;
+        }
+        let validatedRow = 0;
+        rows.forEach(row => {
+            if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
+                validatedRow += 1;
+            }
+        });
+        return rows.length === validatedRow;
     }
 }

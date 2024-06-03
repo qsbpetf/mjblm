@@ -5,7 +5,13 @@
 <!-- Application Tree -->
 <template>
     <lightning-card icon-name="custom:custom55">
-
+        <div class="slds-grid slds-grid_align-end slds-col_padded slds-p-right_medium">
+            <lightning-button variant="brand" label="Godkänn Ansökan" title="Bevilja ansökan" onclick={handleApproveClick} class="slds-button slds-button__brand" disabled={disabledButton}></lightning-button>
+            <br/>
+            <br/>
+            <lightning-button variant="destructive" class="slds-button slds-button__destructive" onclick={handleReject} label="Avslå" title="Avslå"  disabled={disabledButton}></lightning-button>
+        </div>
+        
         <div slot="title" class="slds-grid slds-grid_align-spread">
             <div>{cardTitle}</div>
             <div class="slds-grid" style="font-weight:bold">

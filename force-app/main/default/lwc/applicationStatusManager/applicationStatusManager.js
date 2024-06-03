@@ -12,7 +12,7 @@ export default class ApplicationStatusManager extends LightningElement {
     labels = labels;
 
     _recordId;
-    isOpen = false;
+    // isOpen = false;
 
     @track
     application;
@@ -23,7 +23,7 @@ export default class ApplicationStatusManager extends LightningElement {
     newOwner;
     editMode = false;
     isLoading = false;
-    readyForApproval = false;
+    // readyForApproval = false;
 
     @api
     set recordId(rid) {
@@ -50,58 +50,58 @@ export default class ApplicationStatusManager extends LightningElement {
                     Name: this.form.XC_Hanteras_av__r.Name
                 };
             }
-            this.setIsOpen();
-            this.setReadyForApproval();
+            // this.setIsOpen();
+            // this.setReadyForApproval();
         } catch (e) {
             console.log('error1');
         }
     }
 
-    setIsOpen() {
-        this.isOpen = !(['Approved', 'Rejected'].includes(this.form.XC_Status__c));
-    }
+    // setIsOpen() {
+    //     this.isOpen = !(['Approved', 'Rejected'].includes(this.form.XC_Status__c));
+    // }
 
-    setReadyForApproval() {
-        this.readyForApproval = this.form.XC_Status__c === 'Ready for Decision';
-    }
+    // setReadyForApproval() {
+    //     this.readyForApproval = this.form.XC_Status__c === 'Ready for Decision';
+    // }
 
-    async handleApprove() {
-        const result = await AcceptApplication.open({
-            size: 'medium',
-            description: 'Approve',
-            recordId: `${this.recordId}`,
-        });
+    // async handleApprove() {
+    //     const result = await AcceptApplication.open({
+    //         size: 'medium',
+    //         description: 'Approve',
+    //         recordId: `${this.recordId}`,
+    //     });
 
-        if (result === 'ok') {
-            window.location.reload();
-        } else if (result === 'error') {
-            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
-        }
+    //     if (result === 'ok') {
+    //         window.location.reload();
+    //     } else if (result === 'error') {
+    //         this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+    //     }
 
-    }
+    // }
 
-    async handleReject() {
-        const result = await RejectApplication.open({
-            size: 'medium',
-            description: 'Reject',
-            recordId: `${this.recordId}`,
-        });
+    // async handleReject() {
+    //     const result = await RejectApplication.open({
+    //         size: 'medium',
+    //         description: 'Reject',
+    //         recordId: `${this.recordId}`,
+    //     });
 
-        if (result === 'ok') {
-            window.location.reload();
-        } else if (result === 'error') {
-            this.showNotification('Error', 'Error occurred when updating the form.', 'error');
-        }
-    }
+    //     if (result === 'ok') {
+    //         window.location.reload();
+    //     } else if (result === 'error') {
+    //         this.showNotification('Error', 'Error occurred when updating the form.', 'error');
+    //     }
+    // }
 
-    showNotification(title, message, variant) {
-        const evt = new ShowToastEvent({
-            title: title,
-            message: message,
-            variant: variant,
-        });
-        this.dispatchEvent(evt);
-    }
+    // showNotification(title, message, variant) {
+    //     const evt = new ShowToastEvent({
+    //         title: title,
+    //         message: message,
+    //         variant: variant,
+    //     });
+    //     this.dispatchEvent(evt);
+    // }
 
     async getContacts() {
         try {

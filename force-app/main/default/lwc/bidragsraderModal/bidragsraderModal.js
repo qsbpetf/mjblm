@@ -7,6 +7,8 @@ import ANSOKT_FIELD from '@salesforce/schema/Bidragsrader__c.Ans_kt_V_rde_Kontan
 import BEVILJAT_FIELD from '@salesforce/schema/Bidragsrader__c.Beviljat_V_rde_Presentkort_Kontanter__c';
 import KONTANTPKORT_FIELD from '@salesforce/schema/Bidragsrader__c.Kontanter_Presentkort__c';
 import BESKRIVNING_FIELD from '@salesforce/schema/Bidragsrader__c.Annat_Beskrivning__c';
+import KOSTNAD_MAJBLOMMAN_FIELD from '@salesforce/schema/Bidragsrader__c.Kostnad_majblomman_kr__c';
+import KOMMENTAR_FIELD from '@salesforce/schema/Bidragsrader__c.Kommentar__c';
 
 export default class BidragsraderModal extends LightningElement {
 
@@ -30,7 +32,7 @@ export default class BidragsraderModal extends LightningElement {
     // wire to get the Bidragsrader__c record
     @wire(getRecord, {
         recordId: '$initializedRecordId',
-        fields: [NAME_FIELD, KATEGORI_FIELD, UNDERKAT_FIELD, ANSOKT_FIELD, BEVILJAT_FIELD, KONTANTPKORT_FIELD, BESKRIVNING_FIELD]
+        fields: [NAME_FIELD, KATEGORI_FIELD, UNDERKAT_FIELD, ANSOKT_FIELD, BEVILJAT_FIELD, KONTANTPKORT_FIELD, BESKRIVNING_FIELD, KOSTNAD_MAJBLOMMAN_FIELD, KOMMENTAR_FIELD]
     })
     wiredRecord({ error, data }) {
         console.log('wiredRecord() called with data: ' + data);

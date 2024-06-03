@@ -188,7 +188,8 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     validateApp(row) {
-        return (row.level === 1) && (row.grantedTotalCount === row.grantedDefinedCount);
+        console.log(JSON.stringify(row))
+        return (row.level === 1) && (row.grantedTotalCount === row.grantedDefinedCount) && row.allChildrenValidated;
     }
 
     findSelectedRow(event, selectedRowId) {
@@ -209,10 +210,24 @@ export default class MultiApplicationTree extends LightningElement {
 
     // open accept multiple applications modal
     async handleApproveClick(){
+
+        let grantToApprove = 0;
+        let requestedAmount = 0;
+        this.selectedRows.forEach(appId => {
+            const selectedApp = this.data.find(app => app.id === appId);
+            requestedAmount += selectedApp.request;
+            grantToApprove += selectedApp.granted;
+        });
+
+        console.log(grantToApprove);
+        console.log(requestedAmount);
+
         const result = await AcceptMultipleApplicationsModal.open({
             size: 'medium',
             description: 'Approve',
             recordIds: `${this.selectedRows}`,
+            grantToApprove: grantToApprove,
+            requestedAmount: requestedAmount
         });
 
         if (result === 'ok') {
@@ -268,6 +283,8 @@ export default class MultiApplicationTree extends LightningElement {
             rec.Kontanter_Presentkort__c = event.detail.data.fields.Kontanter_Presentkort__c.value;
             rec.Kategori__c = event.detail.data.fields.Kategori__c.value;
             rec.Underkategori__c = event.detail.data.fields.Underkategori__c.value;
+            rec.Kostnad_majblomman_kr__c = event.detail.data.fields.Kostnad_majblomman_kr__c.value;
+            rec.Kommentar__c = event.detail.data.fields.Kommentar__c.value;
             console.log('Updated record: ', JSON.stringify(rec, null, 2));
             // if (this.asCount(event.detail.data.fields.Beviljat_V_rde_Presentkort_Kontanter__c.value) === 0) {
             //     this.selectedRows = this.selectedRows.filter(row => row !== rec.Application__c);
@@ -299,7 +316,7 @@ export default class MultiApplicationTree extends LightningElement {
         this.childRecordId = childRecId;
         this.childRecordObjectApiName = 'XC_ApplicationEntryChild__c';
         this.childRecordFlowApiName = this.flowApiName;
-        debugger;
+        // debugger;
         // find c-screen-flow component and call startFlow() method
         const flowComponent = this.template.querySelector('c-screen-flow');
         flowComponent.handleStartFlow({
@@ -344,7 +361,7 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     loadApplications() {
-        debugger;
+        // debugger;
         apexGetAllApplications()
             .then(result => {
                 this.isLoading = false;
@@ -361,7 +378,7 @@ export default class MultiApplicationTree extends LightningElement {
     }
 
     paginate() {
-        debugger;
+        // debugger;
         this.pageData = this.data.slice(this.skip, this.pageSize + this.skip);
         this.isFirstPage = this.currentPage === 1;
         this.isLastPage = this.currentPage === this.totalPages;
@@ -530,6 +547,8 @@ export default class MultiApplicationTree extends LightningElement {
                 child.granted = 0;
                 child.grantedDefinedCount = 0;
                 child.grantedTotalCount = 0;
+                const isValid = this.validateApplication(child._children);
+                app.allChildrenValidated &= isValid;
                 child._children.forEach(request => {
                     child.request += this.asData(request.request);
                     child.granted += this.asData(request.granted);
@@ -541,11 +560,6 @@ export default class MultiApplicationTree extends LightningElement {
                     app.granted += this.asData(request.granted);
                     app.grantedDefinedCount += this.asCount(request.granted);
                     app.grantedTotalCount += 1;
-                    //validate method
-                    const isValid = this.validateApplication(request)
-                    // console.log(isValid);
-                    app.allChildrenValidated &= isValid;
-
                 });
                 child.name = child.originalName + ' ' + child.grantedDefinedCount + '/' + child.grantedTotalCount;
             });
@@ -575,8 +589,18 @@ export default class MultiApplicationTree extends LightningElement {
         return !(param === undefined || param === null || param.length === 0)
     }
 
-    validateApplication(row){
-        // console.log(JSON.stringify(row));
-        return this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory);
+    
+
+    validateApplication(rows){
+        if (rows.length === 0){
+            return false;
+        }
+        let validatedRow = 0;
+        rows.forEach(row => {
+            if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
+                validatedRow += 1;
+            }
+        });
+        return rows.length === validatedRow;
     }
 }
