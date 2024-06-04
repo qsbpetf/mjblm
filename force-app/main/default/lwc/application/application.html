@@ -147,6 +147,7 @@
                                                 <lightning-input if:true={isApply} label="Förnamn" type="text" name="firstName" data-id={row.id} value={row.firstName}
                                                                  title="Förnamn får endast innehålla bokstäver och bindestreck"
                                                                  read-only={isCertify}
+                                                                 required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcFirstName" class="slds-form-element__label slds-no-flex">
@@ -160,6 +161,7 @@
                                                 <lightning-input if:true={isApply} label="Efternamn" type="text" name="lastName" data-id={row.id} value={row.lastName}
                                                                  title="Efternamn får endast innehålla bokstäver och bindestreck"
                                                                  read-only={isCertify}
+                                                                 required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcLastName" class="slds-form-element__label slds-no-flex">
@@ -173,6 +175,7 @@
                                                                  data-id={row.id} value={row.year} title={labels.YEAR_PATTERN_MISMATCH}
                                                                  pattern="2[0-9]{3}" message-when-pattern-mismatch={labels.YEAR_PATTERN_MISMATCH} max-length="4"
                                                                  read-only={isCertify}
+                                                                 required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcYear" class="slds-form-element__label slds-no-flex">
@@ -186,6 +189,7 @@
                                                                  pattern="^(\d{10}|(\d{2}-\d{8})|(\d{2}-\d{6}\/\d{1}))$" field-level-help="Samordningsnumret består av 10 siffror, där talet 60 är adderat till födelsedatumet. Om personen exempelvis är född den 1 januari 1970 så är samordningsnumret 700161XXXX. Exempel på LMA-nummer 20-000001/1, och det kan skrivas med eller utan skiljetecken."
                                                                  message-when-pattern-mismatch="Felaktigt format. Se (i) ikonen ovan för en beskrivning av formatet."
                                                                  read-only={isCertify}
+                                                                 required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
 <!--                                                <div if:true={isCertify}>-->
 <!--                                                    <label for="xcSsn" class="slds-form-element__label slds-no-flex">-->
@@ -261,6 +265,7 @@
                                             <td class="small-cell">
                                                 <div class="slds-form-element" if:true={isApply}>
                                                     <label for="country-select" class="slds-form-element__label">
+                                                        <abbr title="required" class="slds-required">*</abbr>
                                                         Välj i rullistan ex. cykel
                                                         <lightning-helptext content="Rullistan består av valbara underkategorier som är grupperade i kategorier (gråa ej valbara rubriker). Välj en underkategori, exempelvis 'Cykel'."
                                                                             style="display: inline-block; margin-left: 8px;"></lightning-helptext>
@@ -268,6 +273,7 @@
                                                     <div class="slds-form-element__control">
                                                         <select id="country-select" class="slds-select" onchange={handleSecondInputChange}
                                                                 readonly={isCertify}
+                                                                required={isApply}
                                                                 name="category" data-id={row.id} value={row.category}>
                                                             <option value="">-- Välj kategori --</option>
                                                             <template for:each={optionGroups} for:item="group">
@@ -278,6 +284,7 @@
                                                                 </optgroup>
                                                             </template>
                                                         </select>
+                                                        <div if:true={row.showError} class="slds-form-element__help red-help" aria-live="assertive">Fyll i detta fält.</div>
                                                     </div>
                                                 </div>
                                                 <div if:true={isCertify}>
@@ -300,7 +307,9 @@
                                             </td>
                                             <td class="small-cell">
                                                 <lightning-select if:true={isApply} label="Välj barn som stödet gäller" name="child" data-id={row.id} value={row.child}
-                                                                  options={childOptions} onchange={handleSecondInputChange}></lightning-select>
+                                                                  options={childOptions}
+                                                                  required={isApply}
+                                                                  onchange={handleSecondInputChange}></lightning-select>
                                                 <div if:true={isCertify}>
                                                     <label for="xcChild" class="slds-form-element__label slds-no-flex">
                                                         Välj barn som stödet gäller

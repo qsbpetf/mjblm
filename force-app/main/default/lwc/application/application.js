@@ -121,7 +121,8 @@ export default class Application extends LightningElement {
             child: '',
             amount: null,
             descriptionDisabled: true,
-            descriptioRequired: false
+            descriptionRequired: false,
+            showError: false
         });
         console.log('Added row with id: ' + id, this.secondRowList);
     }
@@ -143,17 +144,27 @@ export default class Application extends LightningElement {
                 this.calculateTotalAmount();
             } else {
                 if (fieldName === 'category') {
+                    let dropdown = event.target;
                     row.subcategory = value;
                     row.category = this.getPicklistLookup(value);
                     if (row.subcategory.includes('(beskriv)')) {
                         row.description = '';
                         row.descriptionDisabled = false;
-                        row.descriptioRequired = true;
+                        row.descriptionRequired = true;
                     }
                     else {
-                        row.descriptioRequired = false;
+                        row.descriptionRequired = false;
                         row.descriptionDisabled = true;
                         row.description = '';
+                    }
+                    if (!value) {
+                        // If no value is selected, add the class
+                        dropdown.classList.add('no-category-selection');
+                        row.showError = true;
+                    } else {
+                        // If value is selected, remove the class
+                        dropdown.classList.remove('no-category-selection');
+                        row.showError = false;
                     }
                 } else {
                     row[fieldName] = value;

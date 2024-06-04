@@ -118,3 +118,12 @@ lightning-card {
     border-radius: 4px;
     min-height: 30px;
 }
+
+.no-category-selection {
+    border-color: red !important; /* The color can be adjusted as per the requirements */
+    border-width: initial !important;
+}
+
+.red-help {
+    color: var(--lwc-colorTextError, rgb(234, 0, 30));
+}
