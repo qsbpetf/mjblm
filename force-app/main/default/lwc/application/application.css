@@ -85,6 +85,7 @@ lightning-card {
 .small-cell {
     padding-top: 0;
     padding-bottom: 0;
+    vertical-align: top;
 }
 
 .small-cell-icon {

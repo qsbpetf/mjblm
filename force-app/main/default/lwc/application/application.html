@@ -453,18 +453,27 @@
                                 </div>
                             </lightning-layout-item>
                             <lightning-layout-item size="12" medium-device-size="5" padding="horizontal-small">
-                                <lightning-input if:true={isApply}
-                                        message-when-value-missing="Fyll i detta fält"
-                                        data-validity-check="true"
-                                        read-only={isCertify}
-                                        data-field="XC_Vardnadshavare1__c"
-                                        required={isApply}
-                                        field-level-help="Om du är ensam vårdnadshavare fyller du i ditt namn igen i detta fält."
-                                        value={form.XC_Vardnadshavare1__c}
-                                        type="text"
-                                        label="Vårdnadshavare 2"
-                                        onchange={inputChange}>
-                                </lightning-input>
+                                <div if:true={isApply}>
+                                    <lightning-input if:true={isPerson2Required}
+                                            message-when-value-missing="Fyll i detta fält"
+                                            data-validity-check="true"
+                                            read-only={isPerson2Readonly}
+                                            data-field="XC_Vardnadshavare1__c"
+                                            required={isPerson2Required}
+                                                     disabled={isPerson2Readonly}
+                                            field-level-help="Om du är ensam vårdnadshavare fyller du i ditt namn igen i detta fält."
+                                            value={form.XC_Vardnadshavare1__c}
+                                            type="text"
+                                            label="Vårdnadshavare 2"
+                                            onchange={inputChange}>
+                                    </lightning-input>
+                                    <div if:false={isPerson2Required}>
+                                        <label for="xcParent2x" class="slds-form-element__label slds-no-flex">
+                                            Vårdnadshavare 2
+                                        </label>
+                                        <div id="xcParent2x" class="my-readonly-normal">{form.XC_Vardnadshavare1__c}</div>
+                                    </div>
+                                </div>
                                 <div if:true={isCertify}>
                                     <label for="xcParent2" class="slds-form-element__label slds-no-flex">
                                         Vårdnadshavare 2

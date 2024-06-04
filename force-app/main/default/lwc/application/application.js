@@ -77,6 +77,8 @@ export default class Application extends LightningElement {
     @track sumSecondRows = 0;
     @track optionGroups = [];
     picklistLookup = {};
+    @track isPerson2Required = false;
+    @track isPerson2Readonly = true;
 
     // Getter for child select options
     get childOptions() {
@@ -422,6 +424,22 @@ export default class Application extends LightningElement {
         }
         if (dataset.field === 'XC_IntygsskrivarensInfo__c') {
             this.template.querySelector('span[data-id="filesInfo"]').classList.remove('xc-red');
+        }
+        if (dataset.field === 'XC_Vardnadshavare__c' && this.isPerson2Required === false) {
+            this.form['XC_Vardnadshavare1__c'] = this.form['XC_Vardnadshavare__c'];
+        }
+        // E.g. Endast EN vårdnadshavare
+        if (dataset.field === 'XC_BorVardnadshavareTillsammans__c') {
+            if (checked) {
+                this.form['XC_Vardnadshavare1__c'] = this.form['XC_Vardnadshavare__c'];
+                this.isPerson2Required = false;
+                this.isPerson2Readonly = true;
+            }
+            else {
+                this.form['XC_Vardnadshavare1__c'] = '';
+                this.isPerson2Required = this.isApply;
+                this.isPerson2Readonly = false;
+            }
         }
         if (dataset.inputType === 'finance') {
             try {
