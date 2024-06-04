@@ -972,9 +972,10 @@
                 <!-- CERTIFIER INFO -->
 
                 <lightning-layout-item size="12" if:true={isApply}>
-                    <div style="border-bottom: 2px solid black;"
+                    <div style="border-bottom: 2px dashed darkgray;"
                          class="main-card">
                         <label class="slds-m-bottom_medium slds-show_inline-block">{labels.INTYG_EPOST_INFO}</label>
+                        <label class="slds-m-bottom_medium slds-show_inline-block"><span data-id="filesInfo" if:true={isApply}>{filesInfo}</span></label>
                         <lightning-layout multiple-rows="true" horizontal-align="spread" vertical-align="top">
                             <lightning-layout-item size="12" medium-device-size="5"  padding="horizontal-small">
                                 <lightning-input
@@ -1192,9 +1193,6 @@
                                                               value={declaredFiles}
                                                               onchange={handleDeclaredFilesChange}></lightning-checkbox-group>
                                 </div>
-                            </lightning-layout-item>
-                            <lightning-layout-item size="12" padding="around-small">
-                                <span data-id="filesInfo" if:true={isApply}>{filesInfo}</span>
                             </lightning-layout-item>
                         </lightning-layout>
                     </div>
