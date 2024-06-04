@@ -310,7 +310,7 @@
                                             </td>
                                             <td class="small-cell">
                                                 <lightning-input if:true={isApply} label="Skriv totalt belopp ex. 3000" type="number" name="amount" required="true"
-                                                                 data-id={row.id} value={row.amount}
+                                                                 data-id={row.id} value={row.amount} pattern="[1-9]+[0-9]*" message-when-pattern-mismatch="Endast siffor. Måste vara > 0"
                                                                  onchange={handleSecondInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcAmount" class="slds-form-element__label slds-no-flex">
