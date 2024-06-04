@@ -571,6 +571,10 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        min-length="5"
+                                        max-length="5"
+                                        pattern="^\d{5}$"
+                                        message-when-pattern-mismatch="Postnummer måste vara 5 siffror"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Postnummer__c"
