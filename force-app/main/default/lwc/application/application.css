@@ -63,6 +63,10 @@ lightning-card {
     line-height: 1.2;
 }
 
+.bold-text {
+    font-weight: bold;
+}
+
 .child-count {
     font-size: 1.2em;
     font-weight: bold;
