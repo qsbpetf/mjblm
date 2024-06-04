@@ -88,6 +88,12 @@ lightning-card {
     vertical-align: top;
 }
 
+.small-cell-bottom {
+    padding-top: 0;
+    padding-bottom: 0;
+    vertical-align: bottom;
+}
+
 .small-cell-icon {
     padding-top: 1em;
     padding-bottom: 0;

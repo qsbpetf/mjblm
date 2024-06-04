@@ -243,9 +243,9 @@
                             <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
                                 <table class="slds-table slds-var-m-bottom_small">
                                     <thead>
-                                    <tr>
+                                    <tr style="vertical-align: top">
                                         <td colspan="2">
-                                            <div class=""><h3>Vad söker du stöd för?</h3></div>
+                                            <div class=""><h3>Vad söker du stöd för?</h3><h2>Ange önskemål i prioritetsordning enligt barnets behov.</h2></div>
                                         </td>
                                         <td colspan="1">
                                             <div class=""><h3>För vilka barn?</h3></div>
@@ -326,7 +326,7 @@
                                         </tr>
                                     </template>
                                     <tr>
-                                        <td class="small-cell" colspan="2">
+                                        <td class="small-cell-bottom" colspan="2">
                                             <lightning-button if:true={isApply}
                                                     variant="brand" label="Lägg till rad" title="Lägg till rad"
                                                     onclick={addSecondRow} class="slds-button slds-button__neutral">
