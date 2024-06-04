@@ -177,11 +177,14 @@
                                                                  read-only={isCertify}
                                                                  required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
+                                                <div if:true={isApply}>
+                                                    <div if:true={row.showError} class="slds-form-element__help red-help" aria-live="assertive">{labels.YEAR_PATTERN_MISMATCH}</div>
+                                                </div>
                                                 <div if:true={isCertify}>
                                                     <label for="xcYear" class="slds-form-element__label slds-no-flex">
                                                         Födelseår
                                                     </label>
-                                                    <div id="xcYear" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.year}</div>
+                                                    <div id="xcYear" class="my-readonly-normal">{row.year}</div>
                                                 </div>
                                             </td>
                                             <td class="small-cell">

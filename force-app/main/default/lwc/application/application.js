@@ -91,7 +91,7 @@ export default class Application extends LightningElement {
 
     addRow() {
         const id = this.rowList.length + 1;
-        this.rowList.push({ id: id, firstName: '', lastName: '', year: '', ssn: '' });
+        this.rowList.push({ id: id, firstName: '', lastName: '', year: '', ssn: '', showError: false });
         console.log('Added row with id: ' + id, this.rowList);
     }
 
@@ -101,6 +101,8 @@ export default class Application extends LightningElement {
     }
 
     handleInputChange(event) {
+        let inputYear = parseInt(event.target.value, 10);
+        let currentYear = new Date().getFullYear();
         const rowIndex = parseInt(event.target.dataset.id, 10);
         const fieldName = event.target.name;
         const value = event.target.value;
@@ -109,6 +111,8 @@ export default class Application extends LightningElement {
         if (row) {
             row[fieldName] = value;
         }
+
+        row.showError = !Number.isNaN(inputYear) && (currentYear - inputYear > 18);
     }
 
     addSecondRow() {
@@ -288,7 +292,8 @@ export default class Application extends LightningElement {
                     firstName: el.XC_Fornamn__c,
                     lastName: el.XC_Efternamn__c,
                     year: el.XC_Fodelsear__c,
-                    ssn: el.XC_Personnummer__c
+                    ssn: el.XC_Personnummer__c,
+                    showError: false
                 })
             )];
             this.secondRowList = [...this.form.Bidragsrader__r.map(
