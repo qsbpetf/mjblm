@@ -75,6 +75,7 @@ public inherited sharing class ApplicationFormsService {
                                 Barnet_ApplicationEntry__r.XC_Fornamn__c,
                                 Barnet_ApplicationEntry__r.XC_Efternamn__c,
                                 Kategori__c,
+                                F_rening_Klubb__c,
                                 Underkategori__c,
                                 Beviljat_V_rde_Presentkort_Kontanter__c,
                                 Ans_kt_V_rde_Kontanter_Presentkort__c,
@@ -126,6 +127,7 @@ public inherited sharing class ApplicationFormsService {
             requestToInsert.Application__c = application.Id;
             requestToInsert.Kategori__c = (String) request.get('category');
             requestToInsert.Underkategori__c = (String) request.get('subcategory');
+            requestToInsert.F_rening_Klubb__c = (String) request.get('association');
             requestToInsert.Ans_kt_V_rde_Kontanter_Presentkort__c = (Decimal) request.get('amount');
             requestToInsert.Annat_Beskrivning__c = (String) request.get('description');
             if (request.get('child') != null) {
@@ -312,6 +314,9 @@ public inherited sharing class ApplicationFormsService {
                 XC_Vardnadshavare1__c,
                 XC_Approver1__c,
                 XC_Approver2__c,
+                XC_BankensNamn__c,
+                XC_Clearingnummer__c,
+                XC_Kontonummer__c,
                 (SELECT
                     Id,
                     Name,
