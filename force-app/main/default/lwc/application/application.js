@@ -126,7 +126,10 @@ export default class Application extends LightningElement {
             amount: null,
             descriptionDisabled: true,
             descriptionRequired: false,
-            showError: false
+            showError: false,
+            association: '',
+            associationDisabled: true,
+            associationRequired: false
         });
         console.log('Added row with id: ' + id, this.secondRowList);
     }
@@ -156,10 +159,18 @@ export default class Application extends LightningElement {
                         row.descriptionDisabled = false;
                         row.descriptionRequired = true;
                     }
+                    else if (row.subcategory === 'Terminsavgift'){
+                        row.association = '';
+                        row.associationDisabled = false;
+                        row.associationRequired = true;
+                    }
                     else {
                         row.descriptionRequired = false;
                         row.descriptionDisabled = true;
                         row.description = '';
+                        row.associationDisabled = true;
+                        row.associationRequired = false;
+                        row.association = '';
                     }
                     if (!value) {
                         // If no value is selected, add the class
@@ -300,6 +311,7 @@ export default class Application extends LightningElement {
                 el => Object.assign(el, {
                     id: el.Id,
                     category: el.Underkategori__c,
+                    association: el.F_rening_Klubb__c,
                     description: el.Annat_Beskrivning__c,
                     child: el.Barnet_ApplicationEntry__r.XC_Fornamn__c + ' ' + el.Barnet_ApplicationEntry__r.XC_Efternamn__c,
                     amount: el.Ans_kt_V_rde_Kontanter_Presentkort__c

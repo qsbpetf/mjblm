@@ -298,7 +298,7 @@
                                                 </div>
                                             </td>
                                             <td class="small-cell">
-                                                <lightning-input if:true={isApply} label="Vid annat, beskriv" type="text" name="description" required={row.descriptioRequired}
+                                                <lightning-input if:true={isApply} label="Vid annat, beskriv" type="text" name="description" required={row.descriptionRequired}
                                                                  data-id={row.id} value={row.description} disabled={row.descriptionDisabled}
                                                                  onchange={handleSecondInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
@@ -306,6 +306,17 @@
                                                         Vid annat, beskriv
                                                     </label>
                                                     <div id="xcDescription" class="my-readonly-normal">{row.description}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Vid terminsavgift, ange förening/klubb" type="text" name="association" required={row.associationRequired}
+                                                                 data-id={row.id} value={row.association} disabled={row.associationDisabled}
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcAssociation" class="slds-form-element__label slds-no-flex">
+                                                        Vid terminsavgift, ange förening/klubb
+                                                    </label>
+                                                    <div id="xcAssociation" class="my-readonly-normal">{row.association}</div>
                                                 </div>
                                             </td>
                                             <td class="small-cell">
