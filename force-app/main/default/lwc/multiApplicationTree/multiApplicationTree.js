@@ -33,6 +33,7 @@ export default class MultiApplicationTree extends LightningElement {
     @track childRecordFlowApiName = this.flowApiName;
     @track isModalOpen = false; // Used to control the visibility of modal
     @track disabledButton = true;
+    @track hasBankInfo = false;
 
     @track currentPage = 1;
     @track totalPages = 1;
@@ -254,6 +255,7 @@ export default class MultiApplicationTree extends LightningElement {
         this.content = JSON.stringify(this.selectedItem, null, 2);
 
         if (this.selectedItem.level === 3) {
+            this.hasBankInfo = this.selectedItem.hasBankInfo;
             // Open Bidragsrader__c record modal
             this.openModal(this.selectedItem.id);
         } else if (this.selectedItem.level === 2) {
@@ -461,7 +463,7 @@ export default class MultiApplicationTree extends LightningElement {
                     appId: app.Id,
                     name: child.Name,
                     originalName: child.Name,
-                    url: "/application/s/detail/" + child.Id,
+                    // url: "/application/s/detail/" + child.Id,
                     firstName: child.XC_Fornamn__c,
                     lastName: child.XC_Efternamn__c,
                     birthYear: child.XC_Fodelsear__c,
@@ -470,7 +472,7 @@ export default class MultiApplicationTree extends LightningElement {
                     grantedTotalCount: 0,
                     grantedDefinedCount: 0,
                     allChildrenValidated: true,
-                    action: 'Nytt Bidrag',
+                    action: 'Ny Rad',
                     icon: 'utility:add',
                     _children: []
                 };
@@ -491,8 +493,9 @@ export default class MultiApplicationTree extends LightningElement {
                         granted: request.Beviljat_V_rde_Presentkort_Kontanter__c,
                         paymentType: request.Kontanter_Presentkort__c,
                         description: request.Annat_Beskrivning__c,
+                        hasBankInfo: Boolean(app.XC_Clearingnummer__c && app.XC_Kontonummer__c && app.XC_BankensNamn__c),
                         action: 'Redigera',
-                        icon: 'utility:edit',
+                        icon: 'utility:edit'
                     };
                     let child = this.barn[request.Barnet_ApplicationEntry__c];
                     child._children.push(reqNode);
@@ -597,10 +600,22 @@ export default class MultiApplicationTree extends LightningElement {
         }
         let validatedRow = 0;
         rows.forEach(row => {
-            if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
+            if (this.hasText((row.category)) && this.validatePaymentType((row)) && this.hasText(row.subCategory)) {
                 validatedRow += 1;
             }
         });
         return rows.length === validatedRow;
+    }
+
+    validatePaymentType(row){
+        if (row.paymentType === 'Kontanter' && !row.hasBankInfo) {
+            return false;
+        }
+        else if (row.granted === 0 && row.request > 0) {
+            return true;
+        }
+        else {
+            return this.hasText((row.paymentType));
+        }
     }
 }

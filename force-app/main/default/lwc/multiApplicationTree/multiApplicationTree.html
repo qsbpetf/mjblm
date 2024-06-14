@@ -46,7 +46,7 @@
             >
             </lightning-tree-grid>
 
-            <c-bidragsrader-modal record-id={recId} is-open={isModalOpen} onclose={closeModal}></c-bidragsrader-modal>
+            <c-bidragsrader-modal record-id={recId} is-open={isModalOpen} bank-information={hasBankInfo} onclose={closeModal}></c-bidragsrader-modal>
 
             <c-screen-flow flow-api-name={childRecordFlowApiName} onclose={handleFlowSubmit}></c-screen-flow>
         </div>
