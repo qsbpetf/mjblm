@@ -12,6 +12,7 @@ import KOMMENTAR_FIELD from '@salesforce/schema/Bidragsrader__c.Kommentar__c';
 
 export default class BidragsraderModal extends LightningElement {
 
+    @api bankInformation;
     @api isOpen = false;
     @api
     get recordId() {
@@ -27,6 +28,7 @@ export default class BidragsraderModal extends LightningElement {
     }
 
     privateRecordId;
+    textWarning = 'I denna ansökan saknas bankuppgifter, kontanter bör därför inte beviljas';
     @track initializedRecordId = '';
 
     // wire to get the Bidragsrader__c record

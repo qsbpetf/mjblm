@@ -12,6 +12,9 @@
                     <span class="slds-assistive-text">Close</span>
                 </button>
                 <h2 class="slds-text-heading_medium">Redigera Bidragsrader</h2>
+                <template if:false={bankInformation}>
+                    <p style="color: red;">{textWarning}</p>
+                </template>
             </header>
             <!-- Modal content -->
             <div class="slds-modal__content slds-p-around_medium">
