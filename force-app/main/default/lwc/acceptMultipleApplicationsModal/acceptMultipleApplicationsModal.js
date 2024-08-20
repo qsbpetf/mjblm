@@ -46,7 +46,7 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
 
     get infoText(){
         return `<strong>Du har valt att godkänna de markerade ansökningarna. Var vänlig notera följande:</strong><br>
-        1. Godkända ansökningar kommer att försvinna från listvyn: Du kommer inte längre att kunna se eller hantera dessa ansökningar i den nuvarande vyn.<br>
+        1. Obs. De ärenden som godkänns eller avslås kommer inte längre att synas i listvyn för Masshantering. Färdiga ärenden finner du sedan i andra listvyer under fliken ”Ansökningar”.<br>
         2. Åtgärden kan inte ångras: När ansökningarna har godkänts, kan denna åtgärd inte ångras eller ändras utan att kontakta Riksförbundet.<br>
         <strong>Är du säker på att du vill fortsätta med att godkänna alla markerade ansökningar?</strong>`;
     }
