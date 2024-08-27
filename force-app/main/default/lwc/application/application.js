@@ -137,6 +137,7 @@ export default class Application extends LightningElement {
     deleteSecondRow(event) {
         const rowToDelete = parseInt(event.target.name, 10);
         this.secondRowList = this.secondRowList.filter(row => row.id !== rowToDelete);
+        this.calculateTotalAmount();
     }
 
     handleSecondInputChange(event) {
