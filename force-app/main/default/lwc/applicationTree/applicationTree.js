@@ -212,13 +212,12 @@ export default class ApplicationTree extends LightningElement {
     }
     //open accept application modal
     async handleApproveClick(){
-        
         const result = await AcceptMultipleApplicationsModal.open({
             size: 'medium',
             description: 'Approve',
             recordIds: `${this.recordId}`,
-            grantToApprove: this.totalGranted,
-            requestedAmount: this.totalRequested
+            grantToApprove: this._totalGranted,
+            requestedAmount: this._totalRequested
         });
 
         if (result === 'ok') {
