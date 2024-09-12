@@ -266,7 +266,22 @@ export default class Application extends LightningElement {
     }
 
     selectLf(evt) {
+        
         this.selectedLF = this.lfs.find(lf => lf.Id === evt.target.value);
+        this.setApplicationCategory(this.selectedLF.XC_LF_typ__c);
+        //console.log(JSON.stringify(this.form.Ans_kningskategori__c));
+    }
+
+    setApplicationCategory(LfType){
+        if (LfType === 'Majblommegrupp') {
+            this.form.Ans_kningskategori__c = 'Majblommegrupp';
+        }
+        else if (LfType === 'Saknas') {
+            this.form.Ans_kningskategori__c = 'Vit Fläck';
+        }
+        else if (LfType === 'Lokalförening') {
+            this.form.Ans_kningskategori__c = 'Lokalförening';
+        }
     }
 
     get certifierRequired() {

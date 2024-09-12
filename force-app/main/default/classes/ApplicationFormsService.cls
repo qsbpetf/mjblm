@@ -60,6 +60,7 @@ public inherited sharing class ApplicationFormsService {
                         XC_ApprovedByCertifier__c,
                         XC_CertifierRejectionInfo__c,
                         XC_Status__c,
+                        Ans_kningskategori__c,
                         (SELECT
                                 Id,
                                 Name,
@@ -176,6 +177,7 @@ public inherited sharing class ApplicationFormsService {
                         XC_NextApplicationDate1__c,
                         XC_NextApplicationDate2__c,
                         L_pande_ans_kningsdatum__c,
+                        XC_LF_typ__c,
                         Name FROM Account
                 WHERE (XC_Kommun__r.Name = :kommun OR Id = :defaultId)
                 AND LF_Status__c = :LF_STATUS_ACTIVE];
