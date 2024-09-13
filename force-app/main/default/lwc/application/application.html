@@ -121,6 +121,12 @@
                                     <template if:true={nextApplicationDates}>Nästkommande ansökningsdatum: {nextApplicationDates}<br/></template>
                                 </div>
                             </template>
+                            <template if:true={isRiks}>
+                                <h2><b>Vi besvarar alla ansökningar per brev.</b></h2>
+                                <h2><b>Ansökningar behandlas löpande under året. Uppehåll i juli månad.</b> <br/> Beslut skickas inom 8-10 veckor efter inkommen ansökan. <br/> 
+                                    Har du frågor? Mejla: 
+                                    <a href="mailto:bidrag@majblomman.se">bidrag@majblomman.se</a></h2>
+                            </template>
                         </template>
                     </div>
                 </lightning-layout-item>
@@ -146,6 +152,7 @@
                                             <td class="small-cell">
                                                 <lightning-input if:true={isApply} label="Förnamn" type="text" name="firstName" data-id={row.id} value={row.firstName}
                                                                  title="Förnamn får endast innehålla bokstäver och bindestreck"
+                                                                 max-length="50"
                                                                  read-only={isCertify}
                                                                  required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
@@ -160,6 +167,7 @@
                                             <td class="small-cell">
                                                 <lightning-input if:true={isApply} label="Efternamn" type="text" name="lastName" data-id={row.id} value={row.lastName}
                                                                  title="Efternamn får endast innehålla bokstäver och bindestreck"
+                                                                 max-length="50"
                                                                  read-only={isCertify}
                                                                  required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
@@ -232,6 +240,7 @@
                                         data-field="XC_SiblingsAge__c"
                                         value={form.XC_SiblingsAge__c}
                                         type="text"
+                                        max-length="3"
                                         label="Ålder på övriga syskon som bor hemma"
                                         onchange={inputChange}
                                         class="slds-var-m-left_medium">
@@ -298,14 +307,25 @@
                                                 </div>
                                             </td>
                                             <td class="small-cell">
-                                                <lightning-input if:true={isApply} label="Vid annat, beskriv" type="text" name="description" required={row.descriptioRequired}
-                                                                 data-id={row.id} value={row.description} disabled={row.descriptionDisabled}
+                                                <lightning-input if:true={isApply} label="Vid annat, beskriv" type="text" name="description" required={row.descriptionRequired}
+                                                                 data-id={row.id} value={row.description} max-length="100" disabled={row.descriptionDisabled}
                                                                  onchange={handleSecondInputChange}></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcDescription" class="slds-form-element__label slds-no-flex">
                                                         Vid annat, beskriv
                                                     </label>
                                                     <div id="xcDescription" class="my-readonly-normal">{row.description}</div>
+                                                </div>
+                                            </td>
+                                            <td class="small-cell">
+                                                <lightning-input if:true={isApply} label="Vid terminsavgift, ange förening/klubb" type="text" name="association" required={row.associationRequired}
+                                                                 data-id={row.id} value={row.association} disabled={row.associationDisabled} max-length="50"
+                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                                <div if:true={isCertify}>
+                                                    <label for="xcAssociation" class="slds-form-element__label slds-no-flex">
+                                                        Vid terminsavgift, ange förening/klubb
+                                                    </label>
+                                                    <div id="xcAssociation" class="my-readonly-normal">{row.association}</div>
                                                 </div>
                                             </td>
                                             <td class="small-cell">
@@ -323,7 +343,7 @@
                                             <td class="small-cell">
                                                 <lightning-input if:true={isApply} label="Skriv totalt belopp ex. 3000" type="number" name="amount" required="true"
                                                                  data-id={row.id} value={row.amount} pattern="[1-9]+[0-9]*" message-when-pattern-mismatch="Endast siffor. Måste vara > 0"
-                                                                 onchange={handleSecondInputChange}></lightning-input>
+                                                                 onchange={handleSecondInputChange} max-length="6"></lightning-input>
                                                 <div if:true={isCertify}>
                                                     <label for="xcAmount" class="slds-form-element__label slds-no-flex">
                                                         Skriv totalt belopp ex. 3000
@@ -452,6 +472,7 @@
                                         data-validity-check="true"
                                         required={isApply}
                                         read-only={isCertify}
+                                        max-length="100"
                                         data-field="XC_Vardnadshavare__c"
                                         field-level-help="Texta förnamn & efternamn. Majblomman kommunicerar med den här vårdnadshavaren."
                                         value={form.XC_Vardnadshavare__c} type="text"
@@ -470,6 +491,7 @@
                                             message-when-value-missing="Fyll i detta fält"
                                             data-validity-check="true"
                                             read-only={isPerson2Readonly}
+                                            max-length="100"
                                             data-field="XC_Vardnadshavare1__c"
                                             required={isPerson2Required}
                                                      disabled={isPerson2Readonly}
@@ -518,6 +540,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="150"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Bostadsadress__c"
@@ -554,6 +577,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         read-only={isCertify}
                                         data-field="XC_Lagenhetsnummer__c"
                                         value={form.XC_Lagenhetsnummer__c}
@@ -593,6 +617,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="40"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Ort__c"
@@ -612,6 +637,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="254"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Epost__c"
@@ -630,6 +656,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="254"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="Confirm_XC_Epost__c"
@@ -647,6 +674,7 @@
                                 <lightning-input if:true={isApply}
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="20"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-field="XC_Telefonnummer__c"
@@ -676,6 +704,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -691,6 +720,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -706,6 +736,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -721,6 +752,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -736,6 +768,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -751,6 +784,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -766,6 +800,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -781,6 +816,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -796,6 +832,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -811,6 +848,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -826,6 +864,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="10"
                                         required={isApply}
                                         read-only={isCertify}
                                         data-input-type="finance"
@@ -900,6 +939,7 @@
                             <lightning-layout-item size="12" medium-device-size="12" padding="horizontal-small">
                                 <lightning-textarea if:true={isApply}
                                         min-length="20"
+                                        max-length="1500"
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
                                         required={isApply}
@@ -935,6 +975,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="100"
                                         read-only={isCertify}
                                         data-field="XC_BankensNamn__c"
                                         value={form.XC_BankensNamn__c}
@@ -973,6 +1014,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="200"
                                         read-only={isCertify}
                                         data-field="XC_Kontoinnehavarens__c"
                                         value={form.XC_Kontoinnehavarens__c}
@@ -997,6 +1039,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="254"
                                         required={certifierRequired}
                                         data-field="XC_IntygsskrivarensEpost__c"
                                         value={form.XC_IntygsskrivarensEpost__c}
@@ -1009,6 +1052,7 @@
                                 <lightning-input
                                         message-when-value-missing="Fyll i detta fält"
                                         data-validity-check="true"
+                                        max-length="254"
                                         required={certifierRequired}
                                         data-field="Confirm_XC_IntygsskrivarensEpost__c"
                                         value={form.Confirm_XC_IntygsskrivarensEpost__c}

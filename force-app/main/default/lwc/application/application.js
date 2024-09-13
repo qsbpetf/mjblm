@@ -126,7 +126,10 @@ export default class Application extends LightningElement {
             amount: null,
             descriptionDisabled: true,
             descriptionRequired: false,
-            showError: false
+            showError: false,
+            association: '',
+            associationDisabled: true,
+            associationRequired: false
         });
         console.log('Added row with id: ' + id, this.secondRowList);
     }
@@ -134,6 +137,7 @@ export default class Application extends LightningElement {
     deleteSecondRow(event) {
         const rowToDelete = parseInt(event.target.name, 10);
         this.secondRowList = this.secondRowList.filter(row => row.id !== rowToDelete);
+        this.calculateTotalAmount();
     }
 
     handleSecondInputChange(event) {
@@ -156,10 +160,18 @@ export default class Application extends LightningElement {
                         row.descriptionDisabled = false;
                         row.descriptionRequired = true;
                     }
+                    else if (row.subcategory === 'Terminsavgift'){
+                        row.association = '';
+                        row.associationDisabled = false;
+                        row.associationRequired = true;
+                    }
                     else {
                         row.descriptionRequired = false;
                         row.descriptionDisabled = true;
                         row.description = '';
+                        row.associationDisabled = true;
+                        row.associationRequired = false;
+                        row.association = '';
                     }
                     if (!value) {
                         // If no value is selected, add the class
@@ -254,7 +266,22 @@ export default class Application extends LightningElement {
     }
 
     selectLf(evt) {
+        
         this.selectedLF = this.lfs.find(lf => lf.Id === evt.target.value);
+        this.setApplicationCategory(this.selectedLF.XC_LF_typ__c);
+        //console.log(JSON.stringify(this.form.Ans_kningskategori__c));
+    }
+
+    setApplicationCategory(LfType){
+        if (LfType === 'Majblommegrupp') {
+            this.form.Ans_kningskategori__c = 'Majblommegrupp';
+        }
+        else if (LfType === 'Saknas') {
+            this.form.Ans_kningskategori__c = 'Vit Fläck';
+        }
+        else if (LfType === 'Lokalförening') {
+            this.form.Ans_kningskategori__c = 'Lokalförening';
+        }
     }
 
     get certifierRequired() {
@@ -300,6 +327,7 @@ export default class Application extends LightningElement {
                 el => Object.assign(el, {
                     id: el.Id,
                     category: el.Underkategori__c,
+                    association: el.F_rening_Klubb__c,
                     description: el.Annat_Beskrivning__c,
                     child: el.Barnet_ApplicationEntry__r.XC_Fornamn__c + ' ' + el.Barnet_ApplicationEntry__r.XC_Efternamn__c,
                     amount: el.Ans_kt_V_rde_Kontanter_Presentkort__c

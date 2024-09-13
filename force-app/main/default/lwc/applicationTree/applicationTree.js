@@ -22,6 +22,7 @@ export default class ApplicationTree extends LightningElement {
 
     @track isModalOpen = false; // Used to control the visibility of modal
     @track selectedItem = { id: '' }; // Used to store the clicked row data handleRowClick(event) {
+    @track hasBankInfo = false;
     @track content;
 
     @track record;
@@ -104,7 +105,8 @@ export default class ApplicationTree extends LightningElement {
                 name: 'edit_details',
                 label: { fieldName: 'action' },
                 title: { fieldName: 'action' },
-                variant: 'base'
+                variant: 'base',
+                disabled: {fieldName: 'isDisabled'}
             },
             initialWidth: 120
         },
@@ -210,13 +212,12 @@ export default class ApplicationTree extends LightningElement {
     }
     //open accept application modal
     async handleApproveClick(){
-        
         const result = await AcceptMultipleApplicationsModal.open({
             size: 'medium',
             description: 'Approve',
             recordIds: `${this.recordId}`,
-            grantToApprove: this.totalGranted,
-            requestedAmount: this.totalRequested
+            grantToApprove: this._totalGranted,
+            requestedAmount: this._totalRequested
         });
 
         if (result === 'ok') {
@@ -315,11 +316,13 @@ export default class ApplicationTree extends LightningElement {
             return treeData;
         }
 
+        this.hasBankInfo = Boolean(this.record.XC_Clearingnummer__c && this.record.XC_Kontonummer__c && this.record.XC_BankensNamn__c);
+
         this.record.Barnen__r.forEach(child => {
             let childNode = {
                 id: child.Id,
                 name: child.Name,
-                url: "/application/s/detail/" + child.Id,
+                // url: "/application/s/detail/" + child.Id,
                 firstName: child.XC_Fornamn__c,
                 lastName: child.XC_Efternamn__c,
                 birthYear: child.XC_Fodelsear__c,
@@ -327,8 +330,9 @@ export default class ApplicationTree extends LightningElement {
                 granted: 0,
                 grantedTotalCount: 0,
                 grantedDefinedCount: 0,
-                action: 'Nytt Bidrag',
+                action: 'Ny Rad',
                 icon: 'utility:add',
+                isDisabled: this.record.XC_Status__c === 'New',
                 _children: []
             };
             this.barn[child.Id] = childNode;
@@ -352,6 +356,7 @@ export default class ApplicationTree extends LightningElement {
                 description: child.Annat_Beskrivning__c,
                 action: 'Redigera',
                 icon: 'utility:edit',
+                isDisabled: this.record.XC_Status__c === 'New',
             };
             this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
             this.barn[child.Barnet_ApplicationEntry__c].request += this.asData(childNode.request);
@@ -372,7 +377,6 @@ export default class ApplicationTree extends LightningElement {
         });
 
         this.disabledButton = !(allChildrenValidated && this.record.XC_Status__c === 'Ready for Decision');
-
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });
         this.totalRequested = formatter.format(this._totalRequested);
         this.totalGranted = formatter.format(this._totalGranted);
@@ -396,15 +400,27 @@ export default class ApplicationTree extends LightningElement {
 
     //validates if all rows have category, subcategory and paymentType
     validateApplication(rows){
-        if (rows.length === 0){
+        if (rows.length === 0) {
             return false;
         }
         let validatedRow = 0;
         rows.forEach(row => {
-            if (this.hasText((row.category)) && this.hasText((row.paymentType)) && this.hasText(row.subCategory)) {
+            if (this.hasText((row.category)) && this.validatePaymentType((row)) && this.hasText(row.subCategory)) {
                 validatedRow += 1;
             }
         });
         return rows.length === validatedRow;
+    }
+
+    validatePaymentType(row){
+        if (row.paymentType === 'Kontanter' && !this.hasBankInfo) {
+            return false;
+        }
+        else if (row.granted === 0 && row.request > 0) {
+            return true;
+        }
+        else {
+            return this.hasText((row.paymentType));
+        }
     }
 }
