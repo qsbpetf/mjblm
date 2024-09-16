@@ -41,16 +41,6 @@ export default class ScreenFlow extends LightningElement {
         console.log('screenFlow.data = ', JSON.stringify(data));
         this.flowInputVariables = [
             {
-                name : 'varContactId',
-                type : 'String',
-                value : this.contactId
-            },
-            {
-                name : 'varAccountId',
-                type : 'String',
-                value : this.accountId
-            },
-            {
                 name : 'varRecordId',
                 type : 'String',
                 value : data.recordId
