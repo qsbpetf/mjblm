@@ -174,7 +174,6 @@ private class ApplicationFormsControllerTest {
                 Id = UserInfo.getUserId(),
                 UserRoleId = [SELECT DeveloperName FROM UserRole WHERE DeveloperName = :MAJBLOMMAN_ROLE].Id
         );
-        update curr;
         User usr =  new User(
                 ContactId = c.Id,
                 FirstName = c.FirstName,
@@ -191,6 +190,7 @@ private class ApplicationFormsControllerTest {
                 CommunityNickname = c.Email
         );
         System.runAs(curr) {
+            update curr;
             insert usr;
         }
         System.runAs(usr) {

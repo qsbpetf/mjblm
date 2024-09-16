@@ -305,45 +305,104 @@ public inherited sharing class ApplicationFormsService {
     }
 
     public static List<Application__c> getAllApplications() {
-        User currentUser = [SELECT Contact.AccountId, Contact.Account.Name FROM User WHERE Id = :UserInfo.getUserId()];
+        User currentUser = [SELECT Profile.Name, Contact.AccountId, Contact.Account.Name FROM User WHERE Id = :UserInfo.getUserId()];
         System.debug('*** Info: ' + currentUser.Contact.AccountId + ' ' + currentUser.Contact.Account.Name + ' ***');
-        List<Application__c> applications = new List<Application__c>([
-            SELECT
-                Id,
-                Name,
-                XC_Status__c,
-                XC_Vardnadshavare__c,
-                XC_Vardnadshavare1__c,
-                XC_Approver1__c,
-                XC_Approver2__c,
-                XC_BankensNamn__c,
-                XC_Clearingnummer__c,
-                XC_Kontonummer__c,
-                (SELECT
+
+        // First, get the current user's profile name
+        String profileName = currentUser.Profile.Name;
+
+        // Define the allowed profiles
+        Set<String> allowedProfiles = new Set<String> { 'System Administrator', 'Majblomman Standard', 'Systemadministratör' };
+
+        List<Application__c> applications;
+
+        System.debug('*** USER INFO: ' + currentUser + ' ' + profileName + ' ***');
+        if (allowedProfiles.contains(profileName)) {
+            applications = new List<Application__c>([
+                SELECT
                     Id,
                     Name,
-                    XC_Fornamn__c,
-                    XC_Efternamn__c,
-                    XC_Fodelsear__c,
-                    XC_Personnummer__c,
-                    XC_Application__c
-                FROM Barnen__r),
-                (SELECT
+                    XC_Status__c,
+                    XC_Vardnadshavare__c,
+                    XC_Vardnadshavare1__c,
+                    XC_Approver1__c,
+                    XC_Approver2__c,
+                    XC_BankensNamn__c,
+                    XC_Clearingnummer__c,
+                    XC_Kontonummer__c,
+                    (
+                        SELECT
+                            Id,
+                            Name,
+                            XC_Fornamn__c,
+                            XC_Efternamn__c,
+                            XC_Fodelsear__c,
+                            XC_Personnummer__c,
+                            XC_Application__c
+                        FROM Barnen__r
+                    ),
+                    (
+                        SELECT
+                            Id,
+                            Name,
+                            Barnet_ApplicationEntry__c,
+                            Kategori__c,
+                            Underkategori__c,
+                            Beviljat_V_rde_Presentkort_Kontanter__c,
+                            Ans_kt_V_rde_Kontanter_Presentkort__c,
+                            Kontanter_Presentkort__c,
+                            Annat_Beskrivning__c,
+                            Application__c
+                        FROM Bidragsrader__r
+                    )
+                FROM Application__c
+                WHERE
+                    XC_Status__c = :STATUS_READY_FOR_DECISION
+            ]);
+        } else {
+            applications = new List<Application__c>([
+                SELECT
                     Id,
                     Name,
-                    Barnet_ApplicationEntry__c,
-                    Kategori__c,
-                    Underkategori__c,
-                    Beviljat_V_rde_Presentkort_Kontanter__c,
-                    Ans_kt_V_rde_Kontanter_Presentkort__c,
-                    Kontanter_Presentkort__c,
-                    Annat_Beskrivning__c,
-                    Application__c
-                FROM Bidragsrader__r)
-            FROM Application__c
-            WHERE
-                XC_LF__c = :currentUser.Contact.AccountId AND
-                XC_Status__c = :STATUS_READY_FOR_DECISION]);
+                    XC_Status__c,
+                    XC_Vardnadshavare__c,
+                    XC_Vardnadshavare1__c,
+                    XC_Approver1__c,
+                    XC_Approver2__c,
+                    XC_BankensNamn__c,
+                    XC_Clearingnummer__c,
+                    XC_Kontonummer__c,
+                    (
+                        SELECT
+                            Id,
+                            Name,
+                            XC_Fornamn__c,
+                            XC_Efternamn__c,
+                            XC_Fodelsear__c,
+                            XC_Personnummer__c,
+                            XC_Application__c
+                        FROM Barnen__r
+                    ),
+                    (
+                        SELECT
+                            Id,
+                            Name,
+                            Barnet_ApplicationEntry__c,
+                            Kategori__c,
+                            Underkategori__c,
+                            Beviljat_V_rde_Presentkort_Kontanter__c,
+                            Ans_kt_V_rde_Kontanter_Presentkort__c,
+                            Kontanter_Presentkort__c,
+                            Annat_Beskrivning__c,
+                            Application__c
+                        FROM Bidragsrader__r
+                    )
+                FROM Application__c
+                WHERE
+                    XC_LF__c = :currentUser.Contact.AccountId AND
+                    XC_Status__c = :STATUS_READY_FOR_DECISION
+            ]);
+        }
         return applications;
     }
 
