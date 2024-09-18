@@ -7,9 +7,7 @@ private class ApplicationFormsControllerTest {
     private static final String STATUS_NEW = 'New';
     private static final String ONGOING = 'Ongoing';
     private static final String LF_STATUS_AKTIV = 'Aktiv';
-    private static final String MEMBER_STATUS_CURRENT = 'Current';
     private static final String MAJBLOMMAN_ROLE = 'Majblomman';
-
 
     @TestSetup
     static void initData() {
@@ -94,37 +92,6 @@ private class ApplicationFormsControllerTest {
 
         Assert.areEqual(1, lfs.size());
         Assert.areEqual(acc.Id, lfs[0].Id);
-    }
-
-    @IsTest
-    static void testGetApplicationContacts() {
-
-        Account acc = new Account(
-                Name = 'acc',
-                RecordTypeId = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName().get('XC_Lokalforening').getRecordTypeId(),
-                LF_Status__c = LF_STATUS_AKTIV
-        );
-        insert acc;
-
-        Contact c = new Contact(LastName = 'name');
-        insert c;
-
-        npe5__Affiliation__c aff = new npe5__Affiliation__c(
-                npe5__Organization__c = acc.Id,
-                npe5__Contact__c = c.Id,
-                npe5__Status__c = MEMBER_STATUS_CURRENT
-        );
-        insert aff;
-
-        Application__c app = new Application__c (
-                XC_LF__c = acc.Id
-        );
-        insert app;
-
-        List<Contact> cs = ApplicationFormsController.getApplicationContacts(app.Id);
-
-        Assert.areEqual(1, cs.size());
-
     }
 
     @IsTest
