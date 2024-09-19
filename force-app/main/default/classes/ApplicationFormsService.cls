@@ -516,6 +516,9 @@ public inherited sharing class ApplicationFormsService {
                         XC_CertifierRequired__c,
                         XC_CurrentApplicationDate__c,
                         XC_NextApplicationDate__c,
+                        XC_NextApplicationDate1__c,
+                        XC_NextApplicationDate2__c,
+                        L_pande_ans_kningsdatum__c,
                         Name
                 FROM
                         Account
