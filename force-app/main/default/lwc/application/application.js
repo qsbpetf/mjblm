@@ -612,6 +612,11 @@ export default class Application extends LightningElement {
                 if (child.year < new Date().getFullYear() - 19) {
                     agesCorrect = false;
                 }
+                
+                if (!child.ssn || child.ssn.trim() === "") {
+                    this.tableErrors.push("Fältet: Personnummer/Samordningsnummer/LMA-nummer är ej ifylld");
+                    tableValid = false;
+                }
             });
             if (!agesCorrect) {
                 this.tableErrors.push(labels.YEAR_TOO_LOW);
