@@ -1307,6 +1307,16 @@
                     </div>
                 </lightning-layout-item>
                 <!-- SUMMARY -->
+                 <lightning-layout-item if:true={tableErrors} size="12">
+                    <div data-id="no-rows-message" class="slds-p-around-small slds-align_absolute-center slds-text-align_center">
+                        <ul style="color: red;">
+                            <li for:each={tableErrors} for:item="tableError" key={tableError}>
+                                <span if:true={tableError}>{tableError}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </lightning-layout-item>
+
                 <lightning-layout-item size="12">
                     <div class="main-card">
                         <lightning-layout multiple-rows="true" horizontal-align="end" vertical-align="center">
