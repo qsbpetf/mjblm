@@ -131,3 +131,42 @@ lightning-card {
 .red-help {
     color: var(--lwc-colorTextError, rgb(234, 0, 30));
 }
+
+.responsive-layout {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+@media only screen and (max-width: 768px) {
+    .readonly-input {
+        flex: 0 0 100%; /* Full width on small devices */
+    }
+
+    .small-cell, .small-cell-icon {
+        display: block;
+        width: 100%; /* Force inputs to take full width on small devices */
+        padding: 0.5rem 0; /* Optional: Add spacing for readability */
+    }
+
+    .my-readonly-normal {
+        word-wrap: break-word; /* Ensure long text breaks correctly */
+    }
+
+    /* Ensure that the table cells stack vertically */
+    .slds-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .slds-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .slds-table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}

@@ -142,8 +142,8 @@
 
 
 
-                        <lightning-layout multiple-rows="true" horizontal-align="spread">
-                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x readonly-input">
+                        <lightning-layout multiple-rows="true" horizontal-align="spread" class="responsive-layout">
+                            <lightning-layout-item size="10" medium-device-size="8" small-device-size="12" class="slds-p-around_small readonly-input">
 
                                 <table class="slds-table slds-var-m-bottom_small">
                                     <thead>
@@ -208,12 +208,6 @@
                                                                  read-only={isCertify}
                                                                  required={isApply}
                                                                  onchange={handleInputChange}></lightning-input>
-<!--                                                <div if:true={isCertify}>-->
-<!--                                                    <label for="xcSsn" class="slds-form-element__label slds-no-flex">-->
-<!--                                                        Personnummer/Samordningsnummer/LMA-nummer-->
-<!--                                                    </label>-->
-<!--                                                    <div id="xcSsn" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{row.ssn}</div>-->
-<!--                                                </div>-->
                                             </td>
                                             <td class="small-cell-icon">
                                                 <lightning-button-icon if:true={isApply} name={row.id} icon-name="utility:delete" title="Delete"
@@ -222,15 +216,12 @@
                                         </tr>
                                     </template>
                                 </table>
-
-                                <lightning-button if:true={isApply}
-                                        variant="brand" label="Fler Barn" title="Fler Barn"
-                                        onclick={addRow} class="slds-button slds-button__neutral slds-var-m-bottom_x-small slds-var-m-left_x-small">
-                                </lightning-button>
-
-                            </lightning-layout-item>
-                            <lightning-layout-item size="2" class="slds-p-around_small">
-                                <div class="slds-grid slds-grid_pull-padded">
+                                <div class="slds-grid">
+                                    <lightning-button if:true={isApply}
+                                            variant="brand" label="Fler Barn" title="Fler Barn"
+                                            onclick={addRow} class="slds-button slds-button__neutral slds-var-m-bottom_x-small slds-var-m-left_x-small">
+                                    </lightning-button>
+                                    
                                     <div class="slds-col slds-text-align_right slds-align-middle child-count-prefix">
                                         Totalt antal barn som<br/>ansökan gäller:
                                     </div>
@@ -238,9 +229,9 @@
                                         <h1>{rowList.length}</h1>
                                     </div>
                                 </div>
-                            </lightning-layout-item>
 
-                            <lightning-layout-item size="4" medium-device-size="3">
+                            </lightning-layout-item>
+                            <lightning-layout-item size="2" medium-device-size="4" small-device-size="8" class="slds-var-m-left_medium">
                                 <lightning-input if:true={isApply}
                                         read-only={isCertify}
                                         data-field="XC_SiblingsAge__c"
@@ -248,36 +239,25 @@
                                         type="text"
                                         max-length="3"
                                         label="Ålder på övriga syskon som bor hemma"
-                                        onchange={inputChange}
-                                        class="slds-var-m-left_medium">
+                                        onchange={inputChange}>
                                 </lightning-input>
                                 <div if:true={isCertify} class="slds-var-m-left_medium">
-                                    <label for="xcKids" class="slds-form-element__label slds-no-flex">
+                                    <label for="xcKids" class="slds-form-element__label">
                                         Ålder på övriga syskon som bor hemma
                                     </label>
                                     <div id="xcKids" class="my-readonly-normal" title="Förnamn får endast innehålla bokstäver och bindestreck">{form.XC_SiblingsAge__c}</div>
                                 </div>
                             </lightning-layout-item>
                         </lightning-layout>
-
-                        <lightning-layout multiple-rows="true" horizontal-align="spread">
-
-                            <lightning-layout-item size="10" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">
+                        <lightning-layout multiple-rows="true" horizontal-align="spread" class="responsive-layout">
+                            <lightning-layout-item size="10" medium-device-size="8" small-device-size="12" class="slds-p-around_small">
                                 <table class="slds-table slds-var-m-bottom_small">
                                     <thead>
-                                    <tr style="vertical-align: top">
-                                        <td colspan="2">
-                                            <div class=""><h3>Vad söker du stöd för?</h3><h2>Ange önskemål i prioritetsordning enligt barnets behov.</h2></div>
-                                        </td>
-                                        <td colspan="1">
-                                            <div class=""><h3>För vilka barn?</h3></div>
-                                        </td>
-                                        <td colspan="1">
-                                            <div class=""><h3>För vilket belopp?</h3></div>
-                                        </td>
-                                    </tr>
+                                        <lightning-layout-item size="12">
+                                            <label>Nedan anger du vad du söker stöd för, vilket barn det gäller, samt vilket belopp.</label>
+                                            <lightning-helptext content="Om det finns flera önskemål än ett, eller om ansökan gäller flera barn, kan du lägga till ytterligare önskemål eller barn genom att trycka på 'Lägg till rad'. Ange önskemål i prioritetsordning enligt barnets behov." style="display: inline-block; margin-left: 8px;"></lightning-helptext>
+                                        </lightning-layout-item>
                                     </thead>
-                                    <tbody>
                                     <template for:each={secondRowList} for:item="row" for:index="index2">
                                         <tr class="inputRows" key={row.id}>
                                             <td class="small-cell">
@@ -379,87 +359,11 @@
                                             <div class="my-readonly">{form.XC_RequestedAmount__c}</div>
                                         </td>
                                     </tr>
-                                    </tbody>
+                                    
                                 </table>
                             </lightning-layout-item>
-
-
                         </lightning-layout>
-
-
-
-
-
                     </div>
-<!--                    <div style="border-bottom: 2px solid black;" class="main-card">-->
-
-<!--                        <lightning-layout multiple-rows="true" horizontal-align="spread">-->
-<!--                            <lightning-layout-item size="12" class="slds-p-around_small slds-p-bottom_none slds-scrollable_x">-->
-<!--                                &lt;!&ndash;&ndash;&gt;-->
-<!--                                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-bottom_small">-->
-<!--                                    <thead>-->
-<!--                                        <tr class="slds-text-title_caps">-->
-<!--                                            <template for:each={columns} for:item="column" if:true={column.show}>-->
-<!--                                                <th key={column.name}>-->
-<!--                                                    <div class="slds-truncate">{column.label}</div>-->
-<!--                                                </th>-->
-<!--                                            </template>-->
-<!--                                        </tr>-->
-<!--                                    </thead>-->
-<!--                                    <tbody>-->
-<!--                                        <template if:true={data.length} for:each={data} for:item="row" for:index="index">-->
-<!--                                            <tr class="inputRows" key={row.rowIndex}>-->
-<!--                                                <template for:each={columns} for:item="column" if:true={column.show}>-->
-<!--                                                    <td key={column.name}>-->
-<!--                                                        <c-table-input readonlyy={isCertify} oninputchange={onInputChange}-->
-<!--                                                                       row={row} column={column}></c-table-input>-->
-<!--                                                    </td>-->
-<!--                                                </template>-->
-<!--                                                <td>-->
-<!--                                                    <lightning-button-icon if:true={isApply} data-row-index={row.rowIndex}-->
-<!--                                                                           icon-name="utility:delete" value={index}-->
-<!--                                                                           variant="bare"-->
-<!--                                                                           onclick={remove}></lightning-button-icon>-->
-<!--                                                </td>-->
-<!--                                            </tr>-->
-<!--                                        </template>-->
-<!--                                        <template if:false={data.length}>-->
-<!--                                            <div if:true={isApply} class="slds-p-around_large">{labels.AT_LEAST_ONE_ROW}-->
-<!--                                            </div>-->
-<!--                                        </template>-->
-<!--                                    </tbody>-->
-<!--                                </table>-->
-<!--                                &lt;!&ndash;&ndash;&gt;-->
-<!--                            </lightning-layout-item>-->
-<!--                            <lightning-layout-item if:true={tableErrors} size="12">-->
-<!--                                <div data-id="no-rows-message" class="slds-p-around-small">-->
-<!--                                    <ul style="color: red;">-->
-<!--                                        <li for:each={tableErrors} for:item="tableError" key={tableError}>-->
-<!--                                            <span if:true={tableError}>{tableError}</span>-->
-<!--                                        </li>-->
-<!--                                    </ul>-->
-<!--                                </div>-->
-<!--                            </lightning-layout-item>-->
-<!--                            <lightning-layout-item size="5" medium-device-size="4">-->
-<!--                                <lightning-input-->
-<!--                                        read-only={isCertify}-->
-<!--                                        data-field="XC_SiblingsAge__c"-->
-<!--                                        value={form.XC_SiblingsAge__c}-->
-<!--                                        type="text"-->
-<!--                                        label="Ålder på övriga syskon som bor hemma"-->
-<!--                                        onchange={inputChange}></lightning-input>-->
-<!--                            </lightning-layout-item>-->
-<!--                            <lightning-layout-item size="3" medium-device-size="2">-->
-<!--                                <lightning-button-->
-<!--                                        if:true={isApply}-->
-<!--                                        variant="neutral"-->
-<!--                                        class="slds-button slds-button__neutral"-->
-<!--                                        onclick={add}-->
-<!--                                        label="Fler Barn"-->
-<!--                                        title="Fler Barn"></lightning-button>-->
-<!--                            </lightning-layout-item>-->
-<!--                        </lightning-layout>-->
-<!--                    </div>-->
                 </lightning-layout-item>
 
 
