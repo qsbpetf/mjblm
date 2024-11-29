@@ -408,6 +408,24 @@ public inherited sharing class ApplicationFormsService {
         return applications;
     }
 
+    public static Bidragsrader__c clearRow(String jsonData) {
+        Map<String, Object> data = (Map<String, Object>) JSON.deserializeUntyped(jsonData);
+        String recordId = (String) data.get('Id');
+        Decimal granted = Decimal.valueOf((String) data.get('Beviljat_V_rde_Presentkort_Kontanter__c'));
+        Decimal cost = Decimal.valueOf((String) data.get('Kostnad_majblomman_kr__c'));
+
+        Bidragsrader__c row = new Bidragsrader__c(
+                Id = recordId,
+                Beviljat_V_rde_Presentkort_Kontanter__c = granted,
+                Kostnad_majblomman_kr__c = cost
+        );
+        System.debug('Clearing and updating row: ' + row);
+        update row;
+        System.debug('Done updating row: ' + row);
+
+        return row;
+    }
+
     public static List<Application__c> getDuplicated(Id appId) {
         Application__c app = [
                 SELECT

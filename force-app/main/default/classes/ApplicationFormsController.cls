@@ -112,6 +112,17 @@ public without sharing class ApplicationFormsController {
     }
 
     @AuraEnabled
+    public static Bidragsrader__c clearRow(String jsonData) {
+        Bidragsrader__c res;
+        try {
+            res = ApplicationFormsService.clearRow(jsonData);
+            return res;
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+
+    @AuraEnabled
     public static List<Contact> getApproversForCurrentUser(){
         try {
             List<Contact> approvers = ApplicationFormsService.getApproversForCurrentUser();

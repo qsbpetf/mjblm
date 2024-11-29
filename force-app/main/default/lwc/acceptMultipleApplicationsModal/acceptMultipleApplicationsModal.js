@@ -15,8 +15,8 @@ export default class AcceptMultipleApplicationsModal extends LightningModal {
     @track disabledButton = true;
     @track disabledCheckbox = true;
     @track disabledSelect = false;
-    @track amountRequested = 0;
-    @track amountGranted = 0;
+    @track amountRequested = '0';
+    @track amountGranted = '0';
 
     @api set requestedAmount(reqAmount) {
         const formatter = new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' });

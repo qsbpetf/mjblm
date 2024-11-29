@@ -4,6 +4,7 @@
 
 import { LightningElement, track, api } from 'lwc';
 import apexGetAllApplications from '@salesforce/apex/ApplicationFormsController.getAllApplications';
+import apexClearRow from '@salesforce/apex/ApplicationFormsController.clearRow';
 import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 
@@ -106,6 +107,19 @@ export default class MultiApplicationTree extends LightningElement {
                 label: { fieldName: 'action' },
                 title: { fieldName: 'action' },
                 variant: 'base'
+            },
+            initialWidth: 120
+        },
+        {
+            type: 'button',
+            label: 'Avslå',
+            typeAttributes: {
+                iconName: { fieldName: 'icon2' },
+                name: 'remove_details',
+                label: { fieldName: 'action2' },
+                title: { fieldName: 'action2' },
+                variant: 'base',
+                disabled: {fieldName: 'isDisabled'}
             },
             initialWidth: 120
         },
@@ -255,13 +269,52 @@ export default class MultiApplicationTree extends LightningElement {
         this.content = JSON.stringify(this.selectedItem, null, 2);
 
         if (this.selectedItem.level === 3) {
-            this.hasBankInfo = this.selectedItem.hasBankInfo;
-            // Open Bidragsrader__c record modal
-            this.openModal(this.selectedItem.id);
+            if (action.name === 'edit_details') {
+                this.hasBankInfo = this.selectedItem.hasBankInfo;
+                // Open Bidragsrader__c record modal
+                this.openModal(this.selectedItem.id);
+            } else if (action.name === 'remove_details') {
+                this.clearFields(this.selectedItem.id);
+            }
         } else if (this.selectedItem.level === 2) {
             // Open New_Child_Request screen flow
             this.openScreeenFlowModal(this.selectedItem.id);
         }
+    }
+
+    clearFields(recId) {
+        let rec = this.recordById[recId];
+        rec.Kostnad_majblomman_kr__c = 0;
+        rec.Beviljat_V_rde_Presentkort_Kontanter__c = 0;
+        console.log('Updated record: ', JSON.stringify(rec, null, 2));
+
+        let jsonData = JSON.stringify({
+            "Id": recId,
+            "Kostnad_majblomman_kr__c": "0",
+            "Beviljat_V_rde_Presentkort_Kontanter__c": "0"
+        });
+        apexClearRow({ jsonData: jsonData })
+            .then(result => {
+                console.log('Record was cleared: ', JSON.parse(JSON.stringify(result)));
+            })
+            .catch(error => {
+                console.error('Error clearing record', error);
+            });
+
+        let child = this.barn[rec.Barnet_ApplicationEntry__c];
+        let request = child._children.find(item => item.id === rec.Id);
+        request.request = rec.Ans_kt_V_rde_Kontanter_Presentkort__c;
+        let app = this.data.find(item => item.id === rec.Application__c);
+        console.log('Found app: ', app);
+        let pageChild = app._children.find(item => item.id === rec.Barnet_ApplicationEntry__c);
+        console.log('Found pageChild: ', pageChild);
+        let pageRequest = pageChild._children.find(item => item.id === rec.Id);
+        if (pageRequest) {
+            console.log('Found page request: ', pageRequest);
+            pageRequest.granted = rec.Beviljat_V_rde_Presentkort_Kontanter__c;
+        }
+        this.recalculateTree();
+        this.paginate();
     }
 
     openModal(recId) {
@@ -348,6 +401,7 @@ export default class MultiApplicationTree extends LightningElement {
                         app.Bidragsrader__r = [];
                     }
                     app.Bidragsrader__r.push(child.value);
+                    this.recordById[child.value.Id] = child.value;
                     this.updateTree(app, child.value);
                     let currentExpandedRows = this.getExpandedRows();
                     currentExpandedRows.push(child.value.Barnet_ApplicationEntry__c);
@@ -495,7 +549,9 @@ export default class MultiApplicationTree extends LightningElement {
                         description: request.Annat_Beskrivning__c,
                         hasBankInfo: Boolean(app.XC_Clearingnummer__c && app.XC_Kontonummer__c && app.XC_BankensNamn__c),
                         action: 'Redigera',
-                        icon: 'utility:edit'
+                        icon: 'utility:edit',
+                        action2: 'Avslå Rad',
+                        icon2: 'utility:close',
                     };
                     let child = this.barn[request.Barnet_ApplicationEntry__c];
                     child._children.push(reqNode);
@@ -529,6 +585,8 @@ export default class MultiApplicationTree extends LightningElement {
             description: request.Annat_Beskrivning__c,
             action: 'Redigera',
             icon: 'utility:edit',
+            action2: 'Avslå Rad',
+            icon2: 'utility:close',
         };
         childNode._children.push(reqNode);
         this.recalculateTree();

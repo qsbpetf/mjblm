@@ -8,6 +8,7 @@ import apexGetLatestApplications from '@salesforce/apex/ApplicationFormsControll
 import AcceptMultipleApplicationsModal from 'c/acceptMultipleApplicationsModal';
 import RejectApplication from 'c/rejectApplication';
 import {ShowToastEvent} from "lightning/platformShowToastEvent";
+import apexClearRow from "@salesforce/apex/ApplicationFormsController.clearRow";
 
 export default class ApplicationTree extends LightningElement {
 
@@ -111,6 +112,19 @@ export default class ApplicationTree extends LightningElement {
             initialWidth: 120
         },
         {
+            type: 'button',
+            label: 'Avslå',
+            typeAttributes: {
+                iconName: { fieldName: 'icon2' },
+                name: 'remove_details',
+                label: { fieldName: 'action2' },
+                title: { fieldName: 'action2' },
+                variant: 'base',
+                disabled: {fieldName: 'isDisabled'}
+            },
+            initialWidth: 120
+        },
+        {
             type: 'icon',
             label: 'Färdigbeh.',
             cellAttributes: {
@@ -129,17 +143,43 @@ export default class ApplicationTree extends LightningElement {
     handleRowClick(event) {
         this.selectedItem = event.detail.row;
         const action = event.detail.action;
-        console.log('Action: ', action.label);
+        console.log('Action: ', action.name);
         console.log('Selected Row: ', this.selectedItem, JSON.stringify(this.selectedItem, null, 2));
         this.content = JSON.stringify(this.selectedItem, null, 2);
 
         if (this.selectedItem.level === 2) {
-            // Open Bidragsrader__c record modal
-            this.openModal(this.selectedItem.id);
+            if (action.name === 'edit_details') {
+                // Open Bidragsrader__c record modal
+                this.openModal(this.selectedItem.id);
+            } else if (action.name === 'remove_details') {
+                this.clearFields(this.selectedItem.id);
+            }
         } else if (this.selectedItem.level === 1) {
             // Open New_Child_Request screen flow
             this.openScreeenFlowModal(this.selectedItem.id);
         }
+    }
+
+    clearFields(recId) {
+        let rec = this.recordById[recId];
+        rec.Kostnad_majblomman_kr__c = 0;
+        rec.Beviljat_V_rde_Presentkort_Kontanter__c = 0;
+        console.log('Updated record: ', JSON.stringify(rec, null, 2));
+
+        let jsonData = JSON.stringify({
+            "Id": recId,
+            "Kostnad_majblomman_kr__c": "0",
+            "Beviljat_V_rde_Presentkort_Kontanter__c": "0"
+        });
+        apexClearRow({ jsonData: jsonData })
+            .then(result => {
+                console.log('Record was cleared: ', JSON.parse(JSON.stringify(result)));
+            })
+            .catch(error => {
+                console.error('Error clearing record', error);
+            });
+
+        this.data = this.buildTree();
     }
 
     // Method to open the modal
@@ -205,6 +245,7 @@ export default class ApplicationTree extends LightningElement {
                         this.record.Bidragsrader__r = [];
                     }
                     this.record.Bidragsrader__r.push(child.value);
+                    this.recordById[child.value.Id] = child.value;
                     this.data = this.buildTree();
                 }
             }
@@ -356,6 +397,8 @@ export default class ApplicationTree extends LightningElement {
                 description: child.Annat_Beskrivning__c,
                 action: 'Redigera',
                 icon: 'utility:edit',
+                action2: 'Avslå Rad',
+                icon2: 'utility:close',
                 isDisabled: this.record.XC_Status__c === 'New',
             };
             this.barn[child.Barnet_ApplicationEntry__c]._children.push(childNode);
