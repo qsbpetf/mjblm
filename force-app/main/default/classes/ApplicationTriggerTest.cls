@@ -58,22 +58,6 @@ public with sharing class ApplicationTriggerTest {
     }
 
     @IsTest
-    static void testSendEmailWhenApplicationApproved() {
-        Application__c app = new Application__c(
-                XC_Status__c = TEMPORARY,
-                RecordTypeId = Schema.SObjectType.Application__c.getRecordTypeInfosByDeveloperName().get(RT_TEMPORARY).getRecordTypeId()
-        );
-
-        insert app;
-
-        app.XC_Status__c = APPROVED;
-        update app;
-
-        Assert.areEqual(1, Limits.getEmailInvocations());
-        Assert.areEqual(1, ApplicationTriggerHelper.emailsSent);
-    }
-
-    @IsTest
     static void testSendEmailWhenApplicationSubmitted() {
         Application__c app = new Application__c(
                 XC_Status__c = TEMPORARY,
@@ -146,6 +130,32 @@ public with sharing class ApplicationTriggerTest {
         cVersion.VersionData = Blob.valueOf('test');
         cVersion.XC_Form_fileupload__c = app.Id;
         return cVersion;
+    }
+
+
+    @IsTest
+    static void testApprovedDateSet() {
+        Application__c app = new Application__c(
+                XC_Status__c = TEMPORARY,
+                RecordTypeId = Schema.SObjectType.Application__c.getRecordTypeInfosByDeveloperName().get(RT_TEMPORARY).getRecordTypeId()
+        );
+        insert app;
+
+        app = [SELECT XC_ApprovedDate__c FROM Application__c WHERE Id = :app.Id];
+        Assert.isNull(app.XC_ApprovedDate__c);
+
+        app.XC_Status__c = APPROVED;
+
+        update app;
+
+        Test.startTest();
+        update app;
+        Test.stopTest();
+
+        app = [SELECT XC_ApprovedDate__c FROM Application__c WHERE Id = :app.Id];
+        Assert.isNotNull(app.XC_ApprovedDate__c);
+        Assert.areEqual(Date.today(), app.XC_ApprovedDate__c);
+
     }
 
 }

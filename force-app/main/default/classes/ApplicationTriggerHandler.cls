@@ -12,6 +12,7 @@ public with sharing class ApplicationTriggerHandler extends TriggerHandler {
         ApplicationTriggerHelper.setStatuses(newList, oldMap);
         ApplicationTriggerHelper.setRecordType(newList);
         ApplicationTriggerHelper.setOwner(newList, oldMap);
+        ApplicationTriggerHelper.setApprovedDate(newList, oldMap);
     }
 
     public override void afterDelete() {

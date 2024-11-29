@@ -17,7 +17,6 @@ public with sharing class ApplicationTriggerHelper {
     private static final String APPLICANT_WHEN_APP_SENT_TO_CERTIFIER = 'XC_NotifyApplicantSentToCertifier';
     private static final String APPLICANT_WHEN_CERTIFIER_SUBMITTED = 'XC_NotifyApplicantCertifierSubmitted';
     private static final String CERTIFIER_WHEN_THEY_SUBMITTED = 'XC_ConfirmCertifierTheySubmitted';
-    private static final String CERTIFIER_WHEN_APPROVED = 'XC_NotifyCertifierApproved';
     private static final String CERTIFIER_LINK_TO_FORM = 'XC_CertifierNotification';
     private static final String MAJBLOMMAN_ORG_WIDE_ADDRESS_NAME = 'Majblomman Ansökningar';
     private static final String DEFAULT_QUEUE = 'XC_ApplicationsQueue';
@@ -37,7 +36,7 @@ public with sharing class ApplicationTriggerHelper {
                 emails.add(getEmail(app.XC_Epost__c, APPLICANT_WHEN_APP_SENT_TO_CERTIFIER, replacements));
             }
             if (APPROVED.equals(app.XC_Status__c) && !APPROVED.equals(oldMap.get(app.Id).XC_Status__c)) {
-                emails.add(getEmail(app.XC_IntygsskrivarensEpost__c, CERTIFIER_WHEN_APPROVED, replacements));
+//                emails.add(getEmail(app.XC_IntygsskrivarensEpost__c, CERTIFIER_WHEN_APPROVED, replacements));
             }
             if (app.XC_UpdatedByCertifier__c && !oldMap.get(app.Id).XC_UpdatedByCertifier__c) {
                 emails.add(getEmail(app.XC_IntygsskrivarensEpost__c, CERTIFIER_WHEN_THEY_SUBMITTED, replacements));
@@ -97,6 +96,16 @@ public with sharing class ApplicationTriggerHelper {
                 } else {
                     app.OwnerId = queueId;
                 }
+            }
+        }
+    }
+
+    public static void setApprovedDate(List<Application__c> applications, Map<Id, Application__c> oldMap) {
+        for (Application__c app : applications) {
+            if (APPROVED.equals(app.XC_Status__c) && !APPROVED.equals(oldMap.get(app.Id).XC_Status__c)) {
+                app.XC_ApprovedDate__c = Date.today();
+            } else if (!APPROVED.equals(app.XC_Status__c) && app.XC_ApprovedDate__c != null) {
+                app.XC_ApprovedDate__c = null;
             }
         }
     }
